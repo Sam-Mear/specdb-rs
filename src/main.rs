@@ -1,4 +1,4 @@
-use std::{ffi::IntoStringError, fs::{self, DirEntry}};
+use std::{collections::HashSet, ffi::IntoStringError, fs::{self, DirEntry}};
 use yaml_rust2::{Yaml, YamlEmitter, YamlLoader};
 use clap::builder::TypedValueParser;
 
@@ -63,9 +63,18 @@ impl SpecDbFile {
 
 fn main() {
     let bah = list_files("/home/smear/personal/SpecDB/specs".to_string());
+    let mut types = HashSet::new();
     for item in bah {
-        println!("File: {}\nFirstLine: {}", item.file_path, item.contents);
+        if item.data.part_type.name.len() < 3 {
+            println!("bahh: {}", item.file_path);
+        }
+        if !types.contains(&item.data.part_type.name) {
+            types.insert(item.data.part_type.name);
+        }
     };
+    for item in types {
+        println!("type: {}", item);
+    }
 }
 
 fn list_files(dir:String) -> Vec<SpecDbFile>
