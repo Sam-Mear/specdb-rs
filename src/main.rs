@@ -2,9 +2,60 @@ use std::{collections::HashSet, ffi::IntoStringError, fs::{self, DirEntry}};
 use yaml_rust2::{Yaml, YamlEmitter, YamlLoader};
 use clap::builder::TypedValueParser;
 
-struct Type {
-    name: String
+enum Type {
+    Cpu,
+    Apu,
+    GraphicsCard,
+    CpuArchitecture,
+    ApuArchitecture,
+    GraphicsArchitecture,
+    GenericContainer,
+    Hidden
 }
+
+impl Type {
+    pub fn from_label(label: String) -> Option<Self>
+    {
+        if "CPU".to_string() == label {
+            return Some(Self::Cpu);
+        }
+        else if "APU".to_string() == label {
+            return Some(Self::Apu);
+        }
+        if "Graphics Card".to_string() == label {
+            return Some(Self::GraphicsCard);
+        }
+        if "CPU Architecture".to_string() == label {
+            return Some(Self::CpuArchitecture);
+        }
+        if "APU Architecture".to_string() == label {
+            return Some(Self::ApuArchitecture);
+        }
+        if "Graphics Architecture".to_string() == label {
+            return Some(Self::GraphicsArchitecture);
+        }
+        if "Generic Container".to_string() == label {
+            return Some(Self::GenericContainer);
+        }
+        if "Hidden".to_string() == label {
+            return Some(Self::Hidden);
+        }
+        return None;
+    }
+    pub fn label(&self) -> String {
+        match self {
+            Type::Cpu => "CPU".to_string(),
+            Type::Apu => "APU".to_string(),
+            Type::GraphicsCard => "Graphics Card".to_string(),
+            Type::CpuArchitecture => "CPU Architecture".to_string(),
+            Type::ApuArchitecture => "APU Architecture".to_string(),
+            Type::GraphicsArchitecture => "Graphics Architecture".to_string(),
+            Type::GenericContainer => "Generic Container".to_string(),
+            Type::Hidden => "Hidden".to_string(),
+        }
+    }
+}
+
 struct SpecDbStruct {
     name: String,
     part_type: Type,
