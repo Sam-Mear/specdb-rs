@@ -2,6 +2,8 @@ use std::{collections::HashSet, ffi::IntoStringError, fs::{self, DirEntry}};
 use yaml_rust2::{Yaml, YamlEmitter, YamlLoader};
 use clap::builder::TypedValueParser;
 
+// todo: turn each one of these enum variants into a struct
+// easy way to tell which type requires what data, and what data are optional.
 enum Type {
     Cpu,
     Apu,
@@ -90,9 +92,7 @@ impl SpecDbFile {
 
         let mut struct_object = SpecDbStruct {
             name: part_name.to_owned(),
-            part_type: Type {
-                name: part_type
-            },
+            part_type: Type::from_label(part_type).expect(format!("Invalid part type in file: {}", file_path).as_str()),
             is_part: is_part,
             release_date: match release_date{
                 Some(s) => Some(s.to_string()),
@@ -113,19 +113,7 @@ impl SpecDbFile {
 }
 
 fn main() {
-    let bah = list_files("/home/smear/personal/SpecDB/specs".to_string());
-    let mut types = HashSet::new();
-    for item in bah {
-        if item.data.part_type.name.len() < 3 {
-            println!("bahh: {}", item.file_path);
-        }
-        if !types.contains(&item.data.part_type.name) {
-            types.insert(item.data.part_type.name);
-        }
-    };
-    for item in types {
-        println!("type: {}", item);
-    }
+    let bah = list_files("/home/sam/Documents/code/SpecDB/specs".to_string());
 }
 
 fn list_files(dir:String) -> Vec<SpecDbFile>
