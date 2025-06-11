@@ -1,16 +1,85 @@
-use std::{collections::HashSet, ffi::IntoStringError, fs::{self, DirEntry}};
+use std::{collections::HashSet, ffi::IntoStringError, fs::{self, DirEntry}, thread::Thread};
 use yaml_rust2::{Yaml, YamlEmitter, YamlLoader};
 use clap::builder::TypedValueParser;
+
+struct Lithography {
+    value: String
+}
+struct ReleaseDate {
+    value: String
+}
+struct Sockets {
+    value: Vec<String>
+}
+struct CoreCount {
+    value: u16
+}
+struct ThreadCount {
+    value: u16
+}
+struct BaseFrequency {
+    value: String
+}
+struct Tdp {
+    value: String
+}
+struct VramCapacity {
+    value: String
+}
+struct ShaderProcessorCount {
+    value: u32
+}
+struct GpuBaseFrequency {
+    value: String
+}
+
+
+struct CpuArchitecture {
+    lithography: Lithography,
+    release_date: ReleaseDate,
+    sockets: Sockets
+}
+
+struct GraphicsArchitecture {
+    lithography: Lithography,
+    release_date: ReleaseDate
+}
+
+struct ApuArchitecture {
+    lithography: Lithography,
+    release_date: ReleaseDate
+}
+
+struct Cpu {
+    core_count: CoreCount,
+    thread_count: ThreadCount,
+    base_frequency: BaseFrequency,
+    tdp: Tdp
+}
+
+struct GraphicsCard {
+    vram_capacity: VramCapacity,
+    shader_processor_count: ShaderProcessorCount,
+    gpu_base_frequency: GpuBaseFrequency
+}
+
+struct Apu {
+    core_count: CoreCount,
+    thread_count: ThreadCount,
+    base_frequency: BaseFrequency,
+    shader_processor_count: ShaderProcessorCount
+}
+
 
 // todo: turn each one of these enum variants into a struct
 // easy way to tell which type requires what data, and what data are optional.
 enum Type {
-    Cpu,
-    Apu,
-    GraphicsCard,
-    CpuArchitecture,
-    ApuArchitecture,
-    GraphicsArchitecture,
+    Cpu(Cpu),
+    Apu(Apu),
+    GraphicsCard(GraphicsCard),
+    CpuArchitecture(CpuArchitecture),
+    ApuArchitecture(ApuArchitecture),
+    GraphicsArchitecture(GraphicsArchitecture),
     GenericContainer,
     Hidden
 }
@@ -113,7 +182,7 @@ impl SpecDbFile {
 }
 
 fn main() {
-    let bah = list_files("/home/sam/Documents/code/SpecDB/specs".to_string());
+    let bah = list_files("/home/smear/personal/SpecDB/specs".to_string());
 }
 
 fn list_files(dir:String) -> Vec<SpecDbFile>
