@@ -33,11 +33,31 @@ struct GpuBaseFrequency {
     value: String
 }
 
+trait SpecDbType {
+    fn from_data(data: &Yaml) -> Self;
+}
+
 
 struct CpuArchitecture {
     lithography: Lithography,
     release_date: ReleaseDate,
     sockets: Sockets
+}
+impl SpecDbType for CpuArchitecture {
+    fn from_data(data: &Yaml) -> Self {
+        let lithography = data["Lithography"].as_str().expect("Lithography is required for Cpu Architecture").to_string();
+        let release_date = data["Release Date"].as_str().expect("Release Date is required for Cpu Architecture").to_string();
+        let sockets_yaml = data["Sockets"].as_vec().expect("Sockets is required for Cpu Architecture");
+        let mut sockets = Vec::new();
+        for socket in sockets_yaml {
+            sockets.push(socket.as_str().expect("error in socket array").to_string());
+        }
+        CpuArchitecture {
+            lithography: Lithography { value: lithography },
+            release_date: ReleaseDate { value: release_date },
+            sockets: Sockets { value: sockets }
+        }
+    }
 }
 
 struct GraphicsArchitecture {
@@ -85,7 +105,7 @@ enum Type {
 }
 
 impl Type {
-    pub fn from_label(label: String) -> Option<Self>
+    pub fn from_label(label: String, parsed_data: &Yaml) -> Option<Self>
     {
         if "CPU".to_string() == label {
             return Some(Self::Cpu);
@@ -97,7 +117,7 @@ impl Type {
             return Some(Self::GraphicsCard);
         }
         if "CPU Architecture".to_string() == label {
-            return Some(Self::CpuArchitecture);
+            return Some(Self::CpuArchitecture(CpuArchitecture::from_data(&parsed_data)));
         }
         if "APU Architecture".to_string() == label {
             return Some(Self::ApuArchitecture);
@@ -161,7 +181,7 @@ impl SpecDbFile {
 
         let mut struct_object = SpecDbStruct {
             name: part_name.to_owned(),
-            part_type: Type::from_label(part_type).expect(format!("Invalid part type in file: {}", file_path).as_str()),
+            part_type: Type::from_label(part_type, &parsed_data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
             is_part: is_part,
             release_date: match release_date{
                 Some(s) => Some(s.to_string()),
