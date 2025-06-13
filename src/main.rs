@@ -1,37 +1,8 @@
 use std::{collections::HashSet, ffi::IntoStringError, fs::{self, DirEntry}, thread::Thread};
 use yaml_rust2::{Yaml, YamlEmitter, YamlLoader};
 use clap::builder::TypedValueParser;
-
-struct Lithography {
-    value: String
-}
-struct ReleaseDate {
-    value: String
-}
-struct Sockets {
-    value: Vec<String>
-}
-struct CoreCount {
-    value: u16
-}
-struct ThreadCount {
-    value: u16
-}
-struct BaseFrequency {
-    value: String
-}
-struct Tdp {
-    value: String
-}
-struct VramCapacity {
-    value: String
-}
-struct ShaderProcessorCount {
-    value: u32
-}
-struct GpuBaseFrequency {
-    value: String
-}
+mod data;
+use crate::data::{*};
 
 trait SpecDbType {
     fn from_data(data: &Yaml) -> Self;
@@ -50,7 +21,7 @@ impl SpecDbType for CpuArchitecture {
         let sockets_yaml = data["Sockets"].as_vec().expect("Sockets is required for Cpu Architecture");
         let mut sockets = Vec::new();
         for socket in sockets_yaml {
-            sockets.push(socket.as_str().expect("error in socket array").to_string());
+            sockets.push(socket.as_str().expect("error in socket array. Could it be coming in as an integer?").to_string());
         }
         CpuArchitecture {
             lithography: Lithography { value: lithography },
@@ -222,7 +193,7 @@ struct SpecDbFile {
 }
 
 impl SpecDbFile {
-    fn from_file_path(file_path: String) -> Option<SpecDbFile>
+    fn from_file_path(file_path: &String) -> Option<SpecDbFile>
     {
         let contents = fs::read_to_string(file_path.clone()).unwrap();
         println!("{}",file_path.clone().to_string());
@@ -292,14 +263,15 @@ fn list_files(dir:String) -> Vec<SpecDbFile>
 fn check_path(path: DirEntry) -> Vec<SpecDbFile>
 {
     let mut file_names: Vec<SpecDbFile> = Vec::<SpecDbFile>::new();
+    let mut file_with_inherits = Vec::<String>::new();
     if path.file_type().unwrap().is_dir() {
         file_names.extend(list_files(path.path().as_path().to_str().unwrap().to_string()));
     } else {
         let path_str = path.path().as_path().to_str().unwrap().to_owned();
         if !path_str.ends_with("ignore") && !path_str.ends_with("disable") && !path_str.ends_with(".md") {
-            match SpecDbFile::from_file_path(path_str) {
+            match SpecDbFile::from_file_path(&path_str) {
                 Some(specDbBah) => file_names.push(specDbBah),
-                None => (),
+                None => file_with_inherits.push(path_str),
             }
         }
     }
