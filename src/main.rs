@@ -243,37 +243,65 @@ impl SpecDbFile {
 }
 
 fn main() {
-    let bah = list_files("/home/sam/Documents/code/SpecDB/specs".to_string());
+    let bah = parse_spec_db_specs("/home/sam/Documents/code/SpecDB/specs".to_string());
+    println!("Files with inherits: {}", bah.file_with_inherits.iter().count());
+    println!("Files without inherits: {}", bah.spec_db_files.iter().count());
 }
 
-fn list_files(dir:String) -> Vec<SpecDbFile>
+fn parse_spec_db_specs(dir: String) -> SplitSpecDbFiles
+{
+    read_files(dir)
+}
+
+fn read_files(dir:String) -> SplitSpecDbFiles
 {
     let paths = fs::read_dir(dir).unwrap();
-    let mut file_names: Vec<SpecDbFile> = Vec::<SpecDbFile>::new();
+    let mut spec_db_files:SplitSpecDbFiles = SplitSpecDbFiles::new();
     for path in paths {
         match path {
-            Ok(path) => file_names.append(&mut check_path(path)),
+            Ok(path) => spec_db_files.merge(&mut check_path(path)),
             Err(error) => print!("Error when getting path: {}",error),
         }
-        
     }
-    return file_names;
+    return spec_db_files;
 }
 
-fn check_path(path: DirEntry) -> Vec<SpecDbFile>
+struct SplitSpecDbFiles {
+    spec_db_files: Vec<SpecDbFile>,
+    file_with_inherits: Vec<String>
+}
+impl SplitSpecDbFiles {
+    pub fn new() -> Self
+    {
+        SplitSpecDbFiles {
+            spec_db_files: Vec::<SpecDbFile>::new(),
+            file_with_inherits: Vec::<String>::new()
+        }
+    }
+    pub fn merge(&mut self, new: &mut SplitSpecDbFiles)
+    {
+        self.spec_db_files.append(&mut new.spec_db_files);
+        self.file_with_inherits.append(&mut new.file_with_inherits);
+    }
+    // pub fn push_inherits(&mut self, item: String)
+    // {
+    //     self.file_with_inherits.push(item);
+    // }
+}
+
+fn check_path(path: DirEntry) -> SplitSpecDbFiles
 {
-    let mut file_names: Vec<SpecDbFile> = Vec::<SpecDbFile>::new();
-    let mut file_with_inherits = Vec::<String>::new();
+    let mut spec_db_files = SplitSpecDbFiles::new();
     if path.file_type().unwrap().is_dir() {
-        file_names.extend(list_files(path.path().as_path().to_str().unwrap().to_string()));
+        spec_db_files.merge(&mut read_files(path.path().as_path().to_str().unwrap().to_string()));
     } else {
         let path_str = path.path().as_path().to_str().unwrap().to_owned();
         if !path_str.ends_with("ignore") && !path_str.ends_with("disable") && !path_str.ends_with(".md") {
             match SpecDbFile::from_file_path(&path_str) {
-                Some(specDbBah) => file_names.push(specDbBah),
-                None => file_with_inherits.push(path_str),
+                Some(specDbBah) => spec_db_files.spec_db_files.push(specDbBah),
+                None => {spec_db_files.file_with_inherits.push(path_str)},
             }
         }
     }
-    return file_names;
+    return spec_db_files;
 }
