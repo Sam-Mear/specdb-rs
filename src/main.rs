@@ -9,6 +9,7 @@ trait SpecDbType {
 }
 
 
+#[derive(Clone)]
 struct CpuArchitecture {
     lithography: Lithography,
     release_date: ReleaseDate,
@@ -31,6 +32,7 @@ impl SpecDbType for CpuArchitecture {
     }
 }
 
+#[derive(Clone)]
 struct GraphicsArchitecture {
     lithography: Lithography,
     release_date: ReleaseDate
@@ -46,6 +48,7 @@ impl SpecDbType for GraphicsArchitecture {
     }
 }
 
+#[derive(Clone)]
 struct ApuArchitecture {
     lithography: Lithography,
     release_date: ReleaseDate
@@ -61,6 +64,7 @@ impl SpecDbType for ApuArchitecture{
     }
 }
 
+#[derive(Clone)]
 struct Cpu {
     core_count: CoreCount,
     thread_count: ThreadCount,
@@ -82,6 +86,7 @@ impl SpecDbType for Cpu {
     }
 }
 
+#[derive(Clone)]
 struct GraphicsCard {
     vram_capacity: VramCapacity,
     shader_processor_count: ShaderProcessorCount,
@@ -100,6 +105,7 @@ impl SpecDbType for GraphicsCard {
     }
 }
 
+#[derive(Clone)]
 struct Apu {
     core_count: CoreCount,
     thread_count: ThreadCount,
@@ -124,6 +130,7 @@ impl SpecDbType for Apu {
 
 // todo: turn each one of these enum variants into a struct
 // easy way to tell which type requires what data, and what data are optional.
+#[derive(Clone)]
 enum Type {
     Cpu(Cpu),
     Apu(Apu),
@@ -178,6 +185,7 @@ impl Type {
     }
 }
 
+#[derive(Clone)]
 struct SpecDbStruct {
     name: String,
     part_type: Type,
@@ -185,6 +193,7 @@ struct SpecDbStruct {
     release_date: Option<String>
 }
 
+#[derive(Clone)]
 struct SpecDbFile {
     file_path: String,
     contents: String,
@@ -243,7 +252,7 @@ impl SpecDbFile {
 }
 
 fn main() {
-    let bah = parse_spec_db_specs("/home/sam/Documents/code/SpecDB/specs".to_string());
+    let bah = parse_spec_db_specs("/home/smear/personal/SpecDB/specs".to_string());
     println!("Files with inherits: {}", bah.file_with_inherits.iter().count());
     println!("Files without inherits: {}", bah.spec_db_files.iter().count());
 }
@@ -264,6 +273,10 @@ fn read_files(dir:String) -> SplitSpecDbFiles
         }
     }
     return spec_db_files;
+}
+
+struct SpecDb {
+    files: Vec<SpecDbFile>
 }
 
 struct SplitSpecDbFiles {
@@ -287,6 +300,52 @@ impl SplitSpecDbFiles {
     // {
     //     self.file_with_inherits.push(item);
     // }
+    pub fn get_spec_db(&self) -> SpecDb
+    {
+        let mut hidden_files = self.get_hidden_types();
+
+        // let mut merged_files: Vec<>
+        for file_path in self.file_with_inherits.clone().into_iter() {
+            let contents = fs::read_to_string(file_path.clone()).unwrap();
+            println!("{}",file_path.clone().to_string());
+            let parsed_data = YamlLoader::load_from_str(&contents).unwrap()[0].clone();
+            let is_part = match parsed_data["isPart"].as_bool() {
+                Some(is_part) => is_part,
+                None => false,
+            };
+            let part_type = match parsed_data["type"].as_str() {
+                Some(s) => s.to_string(),
+                None => "".to_string(),
+            };
+            let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
+            let release_date = parsed_data["data"]["Release Date"].as_str();
+            let inherits = parsed_data["inherits"].as_vec().expect("Expected array in inherits");
+            for inherit_name in inherits {
+                inherit_name = inherit_name.as_str().expect("Inherit name expected to be a string");
+                // get the inherit object
+                
+                // turn the ['data'] into a hashmap
+                // foreach the next inherit object ['data'] hashmap into the above
+                // and finally foreach the object['data'] into the same hash map
+                // then generate the SpecDbFile from that.
+            }
+            
+
+        }
+
+        SpecDb { files: hidden_files }
+    }
+
+    fn get_hidden_types(&self) -> Vec<SpecDbFile>
+        {
+            let mut hidden_files = Vec::<SpecDbFile>::new();
+            for each in self.spec_db_files.clone().into_iter() {
+                if let Type::Hidden = each.data.part_type {
+                    hidden_files.push(each.clone());
+                }
+            }
+            return hidden_files;
+        }
 }
 
 fn check_path(path: DirEntry) -> SplitSpecDbFiles
