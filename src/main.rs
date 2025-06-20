@@ -1,4 +1,5 @@
 use std::{collections::HashSet, ffi::IntoStringError, fs::{self, DirEntry}, thread::Thread};
+use hashlink::LinkedHashMap;
 use yaml_rust2::{Yaml, YamlEmitter, YamlLoader};
 use clap::builder::TypedValueParser;
 mod data;
@@ -202,6 +203,7 @@ struct SpecDbFile {
 }
 
 impl SpecDbFile {
+    // fn from_yaml()
     fn from_file_path(file_path: &String) -> Option<SpecDbFile>
     {
         let contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -319,16 +321,23 @@ impl SplitSpecDbFiles {
             };
             let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
             let release_date = parsed_data["data"]["Release Date"].as_str();
+            let mut data = LinkedHashMap::<Yaml, Yaml>::new();
             let inherits = parsed_data["inherits"].as_vec().expect("Expected array in inherits");
             for inherit_name in inherits {
-                inherit_name = inherit_name.as_str().expect("Inherit name expected to be a string");
+                let inherit_name = inherit_name.as_str().expect("Inherit name expected to be a string").to_owned();
                 // get the inherit object
+                let inherit_object = self.find_by_name(&inherit_name.as_str(), Some(&hidden_files))
+                                    .expect(format!("Expected a hidden type yaml file with name {}", inherit_name).as_str());
                 
                 // turn the ['data'] into a hashmap
+                let local_data = inherit_object.yaml.as_hash().expect("Failed to create hashmap out of Data");
                 // foreach the next inherit object ['data'] hashmap into the above
-                // and finally foreach the object['data'] into the same hash map
-                // then generate the SpecDbFile from that.
+                for bah in local_data.iter() {
+                    data.insert(bah.0.clone(), bah.1.clone());
+                }
             }
+
+            // then generate the SpecDbFile from that.
             
 
         }
@@ -337,15 +346,30 @@ impl SplitSpecDbFiles {
     }
 
     fn get_hidden_types(&self) -> Vec<SpecDbFile>
-        {
-            let mut hidden_files = Vec::<SpecDbFile>::new();
-            for each in self.spec_db_files.clone().into_iter() {
-                if let Type::Hidden = each.data.part_type {
-                    hidden_files.push(each.clone());
-                }
+    {
+        let mut hidden_files = Vec::<SpecDbFile>::new();
+        for each in self.spec_db_files.clone().into_iter() {
+            if let Type::Hidden = each.data.part_type {
+                hidden_files.push(each.clone());
             }
-            return hidden_files;
         }
+        return hidden_files;
+    }
+
+    fn find_by_name(&self, search_term: &str, search_list: Option<&Vec<SpecDbFile>>) -> Option<SpecDbFile>
+    {
+        let search_list = match search_list {
+            Some(search_list) => search_list,
+            None => &self.spec_db_files,
+        };
+
+        for each in search_list.iter() {
+            if each.data.name.as_str() == search_term {
+                return Some(each.clone());
+            }
+        }
+        return None;
+    }
 }
 
 fn check_path(path: DirEntry) -> SplitSpecDbFiles

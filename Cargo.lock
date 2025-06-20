@@ -288,6 +288,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "dialoguer",
+ "hashlink",
  "yaml-rust2",
 ]
 
