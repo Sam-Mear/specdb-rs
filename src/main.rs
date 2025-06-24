@@ -127,6 +127,10 @@ impl SpecDbType for Apu {
             shader_processor_count: ShaderProcessorCount { value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
         }
     }
+    
+    fn from_hashmap(data: LinkedHashMap) -> Self {
+        data.get
+    }
 }
 
 
@@ -173,9 +177,33 @@ impl Type {
         }
         return None;
     }
-    pub fn from_hashmap(label: String, data: LinkedHashMap) -> Option<Self>
+    pub fn from_hashmap(label: String, data: LinkedHashMap<Yaml, Yaml>) -> Option<Self>
     {
-        None
+        if "CPU".to_string() == label {
+            return Some(Self::Cpu(Cpu::from_hashmap(&data)));
+        }
+        else if "APU".to_string() == label {
+            return Some(Self::Apu(Apu::from_hashmap(&data)));
+        }
+        if "Graphics Card".to_string() == label {
+            return Some(Self::GraphicsCard(GraphicsCard::from_hashmap(&data)));
+        }
+        if "CPU Architecture".to_string() == label {
+            return Some(Self::CpuArchitecture(CpuArchitecture::from_hashmap(&data)));
+        }
+        if "APU Architecture".to_string() == label {
+            return Some(Self::ApuArchitecture(ApuArchitecture::from_hashmap(&data)));
+        }
+        if "Graphics Architecture".to_string() == label {
+            return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_hashmap(&data)));
+        }
+        if "Generic Container".to_string() == label {
+            return Some(Self::GenericContainer);
+        }
+        if "Hidden".to_string() == label {
+            return Some(Self::Hidden);
+        }
+        return None;
     }
     pub fn label(&self) -> String {
         match self {
@@ -196,7 +224,6 @@ struct SpecDbStruct {
     name: String,
     part_type: Type,
     is_part: bool,
-    release_date: Option<String>
 }
 
 #[derive(Clone)]
@@ -234,14 +261,10 @@ impl SpecDbFile {
 
             println!("Parsing {}", part_name);
 
-            let mut struct_object = SpecDbStruct {
+            let struct_object = SpecDbStruct {
                 name: part_name.to_owned(),
                 part_type: Type::from_yaml(part_type, &parsed_data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
-                is_part: is_part,
-                release_date: match release_date{
-                    Some(s) => Some(s.to_string()),
-                    None => None,
-                }
+                is_part: is_part
             };
 
 
@@ -257,7 +280,7 @@ impl SpecDbFile {
         None
     }
 
-    fn from_file_path_and_inherit(file_path: &String, data: LinkedHashMap) -> Option<SpecDbFile>
+    fn from_file_path_and_inherit(file_path: &String, mut data: LinkedHashMap<Yaml, Yaml>) -> Option<SpecDbFile>
     {
         let contents = fs::read_to_string(file_path.clone()).unwrap();
         println!("{}",file_path.clone().to_string());
@@ -271,11 +294,23 @@ impl SpecDbFile {
             None => "".to_string(),
         };
         let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
-        let mut main_data = parsed_data["data"].as_hash().unwrap();
+        let main_data = parsed_data["data"].as_hash().unwrap();
         for data_element in main_data.iter() {
             data.insert(data_element.0.clone(), data_element.1.clone());
         }
-        None
+
+        let mut struct_object = SpecDbStruct {
+            name: part_name.to_owned(),
+            part_type: Type::from_hashmap(part_type, data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
+            is_part: is_part
+        };
+        let bah = SpecDbFile {
+            file_path: file_path.clone(),
+            contents: contents.clone(),
+            yaml: YamlLoader::load_from_str(&contents).unwrap()[0].clone(),
+            data: struct_object
+        };
+        return Some(bah);
     }
 }
 
