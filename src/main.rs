@@ -7,7 +7,7 @@ use crate::data::{*};
 
 trait SpecDbType {
     fn from_yaml(data: &Yaml) -> Self;
-    fn from_hashmap(data: LinkedHashMap) -> Self;
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self;
 }
 
 
@@ -19,6 +19,21 @@ struct CpuArchitecture {
 }
 impl SpecDbType for CpuArchitecture {
     fn from_yaml(data: &Yaml) -> Self {
+        let lithography = data["Lithography"].as_str().expect("Lithography is required for Cpu Architecture").to_string();
+        let release_date = data["Release Date"].as_str().expect("Release Date is required for Cpu Architecture").to_string();
+        let sockets_yaml = data["Sockets"].as_vec().expect("Sockets is required for Cpu Architecture");
+        let mut sockets = Vec::new();
+        for socket in sockets_yaml {
+            sockets.push(socket.as_str().expect("error in socket array. Could it be coming in as an integer?").to_string());
+        }
+        CpuArchitecture {
+            lithography: Lithography { value: lithography },
+            release_date: ReleaseDate { value: release_date },
+            sockets: Sockets { value: sockets }
+        }
+    }
+    
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self {
         let lithography = data["Lithography"].as_str().expect("Lithography is required for Cpu Architecture").to_string();
         let release_date = data["Release Date"].as_str().expect("Release Date is required for Cpu Architecture").to_string();
         let sockets_yaml = data["Sockets"].as_vec().expect("Sockets is required for Cpu Architecture");
@@ -48,6 +63,15 @@ impl SpecDbType for GraphicsArchitecture {
             release_date: ReleaseDate { value: release_date }
         }
     }
+    
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self {
+        let lithography = data["Lithography"].as_str().expect("Lithography is required for Cpu Architecture").to_string();
+        let release_date = data["Release Date"].as_str().expect("Release Date is required for Cpu Architecture").to_string();
+        GraphicsArchitecture {
+            lithography: Lithography { value: lithography },
+            release_date: ReleaseDate { value: release_date }
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -59,6 +83,19 @@ impl SpecDbType for ApuArchitecture{
     fn from_yaml(data: &Yaml) -> Self {
         let lithography = data["Lithography"].as_str().expect("Lithography is required for Cpu Architecture").to_string();
         let release_date = data["Release Date"].as_str().expect("Release Date is required for Cpu Architecture").to_string();
+        ApuArchitecture {
+            lithography: Lithography { value: lithography },
+            release_date: ReleaseDate { value: release_date }
+        }
+    }
+    
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self {
+        let lithography = data.get("Lithography")
+                .expect("Lithography is required for Cpu Architecture")
+                .as_str().expect("Lithography must be string").to_string();
+        let release_date = data.get("Release Date")
+                .expect("Release Date is required for Cpu Architecture")
+                .as_str().expect("Release Date must be string").to_string();
         ApuArchitecture {
             lithography: Lithography { value: lithography },
             release_date: ReleaseDate { value: release_date }
@@ -86,6 +123,22 @@ impl SpecDbType for Cpu {
             tdp: Tdp { value: tdp }
         }
     }
+    
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self {
+        // for (key, _) in &data {
+        //     println!("key: {}", key);
+        // }
+        let core_count = data.get("Core Count").expect("Core Count is required for type CPU").as_i64().expect("Core Count must be int");
+        let thread_count = data.get("Thread Count").expect("Thread count is required for type CPU").as_i64().expect("Thread count must be int");
+        let base_frequency = data.get("Base Frequency").expect("Base Frequency is required for type CPU").as_str().expect("Base Frequency must be string").to_string();
+        let tdp = data.get("TDP").expect("TDP is required for type Cpu").as_str().expect("TDP must be string").to_string();
+        Cpu {
+            core_count: CoreCount { value: u16::try_from(core_count).expect("Core Count too large") },
+            thread_count: ThreadCount { value: u16::try_from(thread_count).expect("Core Count too large") },
+            base_frequency: BaseFrequency { value: base_frequency },
+            tdp: Tdp { value: tdp }
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -101,6 +154,23 @@ impl SpecDbType for GraphicsCard {
         let gpu_base_frequency = data["GPU Base Frequency"].as_str().expect("GPU Base Frequency is required for type Graphics Card.").to_string();
         GraphicsCard {
             vram_capacity: VramCapacity { value: vram_capacity },
+            shader_processor_count: ShaderProcessorCount { value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
+            gpu_base_frequency: GpuBaseFrequency { value: gpu_base_frequency }
+        }
+    }
+    
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self {
+        let vram_capacity = data.get("VRAM Capacity")
+                .expect("VRAM Capacity is required for type Grahpics Card.")
+                .as_str().expect("VRAM Capacity must be string");
+        let shader_processor_count = data.get("Shader Processor Count")
+                .expect("Shader Processor Count is required for type Graphics Card")
+                .as_i64().expect("Shader Processor Count must be int");
+        let gpu_base_frequency = data.get("GPU Base Frequency")
+                .expect("GPU Base Frequency is required for type Graphics Card")
+                .as_str().expect("GPU Base Frequency must be string.").to_string();
+        GraphicsCard {
+            vram_capacity: VramCapacity { value: vram_capacity.to_string() },
             shader_processor_count: ShaderProcessorCount { value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
             gpu_base_frequency: GpuBaseFrequency { value: gpu_base_frequency }
         }
@@ -128,8 +198,26 @@ impl SpecDbType for Apu {
         }
     }
     
-    fn from_hashmap(data: LinkedHashMap) -> Self {
-        data.get
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self {
+        let core_count = data.get("Core Count")
+                .expect("Core Count is required for type Apu.")
+                .as_i64().expect("Core Count must be i64");
+        let thread_count = data.get("Thread Count")
+                .expect("Thread Count is required for type Apu")
+                .as_i64().expect("Thread Count must be i64");
+        let base_frequency = data.get("Base Frequency")
+                .expect("Base Frequency is required for Apu")
+                .as_str().expect("Base Frequency must be string");
+        let shader_processor_count = data.get("Shader Processor Count")
+                .expect("Shader Proccessor Count is required for type Apu")
+                .as_i64().expect("Shader Processor count must be i64");
+        
+        Apu {
+            core_count: CoreCount { value: u16::try_from(core_count).expect("Core Count too large") },
+            thread_count: ThreadCount { value: u16::try_from(thread_count).expect("Core Count too large") },
+            base_frequency: BaseFrequency { value: base_frequency.to_string() },
+            shader_processor_count: ShaderProcessorCount { value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
+        }
     }
 }
 
@@ -177,25 +265,25 @@ impl Type {
         }
         return None;
     }
-    pub fn from_hashmap(label: String, data: LinkedHashMap<Yaml, Yaml>) -> Option<Self>
+    pub fn from_hashmap(label: String, data: LinkedHashMap<String, Yaml>) -> Option<Self>
     {
         if "CPU".to_string() == label {
-            return Some(Self::Cpu(Cpu::from_hashmap(&data)));
+            return Some(Self::Cpu(Cpu::from_hashmap(data)));
         }
         else if "APU".to_string() == label {
-            return Some(Self::Apu(Apu::from_hashmap(&data)));
+            return Some(Self::Apu(Apu::from_hashmap(data)));
         }
         if "Graphics Card".to_string() == label {
-            return Some(Self::GraphicsCard(GraphicsCard::from_hashmap(&data)));
+            return Some(Self::GraphicsCard(GraphicsCard::from_hashmap(data)));
         }
         if "CPU Architecture".to_string() == label {
-            return Some(Self::CpuArchitecture(CpuArchitecture::from_hashmap(&data)));
+            return Some(Self::CpuArchitecture(CpuArchitecture::from_hashmap(data)));
         }
         if "APU Architecture".to_string() == label {
-            return Some(Self::ApuArchitecture(ApuArchitecture::from_hashmap(&data)));
+            return Some(Self::ApuArchitecture(ApuArchitecture::from_hashmap(data)));
         }
         if "Graphics Architecture".to_string() == label {
-            return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_hashmap(&data)));
+            return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_hashmap(data)));
         }
         if "Generic Container".to_string() == label {
             return Some(Self::GenericContainer);
@@ -280,7 +368,7 @@ impl SpecDbFile {
         None
     }
 
-    fn from_file_path_and_inherit(file_path: &String, mut data: LinkedHashMap<Yaml, Yaml>) -> Option<SpecDbFile>
+    fn from_file_path_and_inherit(file_path: &String, mut data: LinkedHashMap<String, Yaml>) -> Option<SpecDbFile>
     {
         let contents = fs::read_to_string(file_path.clone()).unwrap();
         println!("{}",file_path.clone().to_string());
@@ -296,7 +384,7 @@ impl SpecDbFile {
         let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
         let main_data = parsed_data["data"].as_hash().unwrap();
         for data_element in main_data.iter() {
-            data.insert(data_element.0.clone(), data_element.1.clone());
+            data.insert(data_element.0.as_str().expect("expected string").to_string(), data_element.1.clone());
         }
 
         let mut struct_object = SpecDbStruct {
@@ -318,6 +406,8 @@ fn main() {
     let bah = parse_spec_db_specs("/home/smear/personal/SpecDB/specs".to_string());
     println!("Files with inherits: {}", bah.file_with_inherits.iter().count());
     println!("Files without inherits: {}", bah.spec_db_files.iter().count());
+    let bah2 = bah.get_spec_db();
+    println!("Files parsed total: {}", bah2.files.iter().count());
 }
 
 fn parse_spec_db_specs(dir: String) -> SplitSpecDbFiles
@@ -365,6 +455,7 @@ impl SplitSpecDbFiles {
     // }
     pub fn get_spec_db(&self) -> SpecDb
     {
+        let mut merged_with_inherit = Vec::<SpecDbFile>::new();
         let mut hidden_files = self.get_hidden_types();
 
         // let mut merged_files: Vec<>
@@ -382,7 +473,7 @@ impl SplitSpecDbFiles {
             };
             let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
             let release_date = parsed_data["data"]["Release Date"].as_str();
-            let mut data = LinkedHashMap::<Yaml, Yaml>::new();
+            let mut data = LinkedHashMap::<String, Yaml>::new();
             let inherits = parsed_data["inherits"].as_vec().expect("Expected array in inherits");
             for inherit_name in inherits {
                 let inherit_name = inherit_name.as_str().expect("Inherit name expected to be a string").to_owned();
@@ -391,19 +482,21 @@ impl SplitSpecDbFiles {
                                     .expect(format!("Expected a hidden type yaml file with name {}", inherit_name).as_str());
                 
                 // turn the ['data'] into a hashmap
-                let local_data = inherit_object.yaml.as_hash().expect("Failed to create hashmap out of Data");
+                let local_data = inherit_object.yaml["data"].as_hash().expect("Failed to create hashmap out of Data");
                 // foreach the next inherit object ['data'] hashmap into the above
                 for bah in local_data.iter() {
-                    data.insert(bah.0.clone(), bah.1.clone());
+                    data.insert(bah.0.as_str().expect("Value expected as string").to_string(), bah.1.clone());
                 }
             }
 
             // then generate the SpecDbFile from that.
+            merged_with_inherit.push(SpecDbFile::from_file_path_and_inherit(&file_path, data).unwrap());
             
 
         }
 
-        SpecDb { files: hidden_files }
+        merged_with_inherit.append(&mut self.spec_db_files.clone());
+        SpecDb { files: merged_with_inherit }
     }
 
     fn get_hidden_types(&self) -> Vec<SpecDbFile>
