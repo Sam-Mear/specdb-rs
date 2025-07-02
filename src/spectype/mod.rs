@@ -14,7 +14,6 @@ pub use apu::Apu;
 use hashlink::LinkedHashMap;
 use yaml_rust2::Yaml;
 
-use crate::SpecDbType;
 
 // todo: turn each one of these enum variants into a struct
 // easy way to tell which type requires what data, and what data are optional.
@@ -99,4 +98,9 @@ impl Type {
             Type::Hidden => "Hidden".to_string(),
         }
     }
+}
+
+pub trait SpecDbType {
+    fn from_yaml(data: &Yaml) -> Self;
+    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self;
 }

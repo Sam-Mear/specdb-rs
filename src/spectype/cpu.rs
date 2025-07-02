@@ -1,7 +1,7 @@
 use hashlink::LinkedHashMap;
 use yaml_rust2::Yaml;
 
-use crate::{data::*, SpecDbType};
+use crate::{data::*, spectype::SpecDbType};
 
 #[derive(Clone)]
 pub struct Cpu {

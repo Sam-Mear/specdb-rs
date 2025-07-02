@@ -1,108 +1,67 @@
-use yaml_rust2::Yaml;
+use std::fs::{self, DirEntry};
+
+use yaml_rust2::{Yaml, YamlLoader};
 use hashlink::LinkedHashMap;
 
-pub mod spectype;
+use crate::{parser::{SpecDbFile, SplitSpecDbFiles}, spectype::Type};
 
+pub mod spectype;
+pub mod parser;
 pub mod data;
 
-
-pub trait SpecDbType {
-    fn from_yaml(data: &Yaml) -> Self;
-    fn from_hashmap(data: LinkedHashMap<String, Yaml>) -> Self;
+pub struct SpecDb {
+    pub files: Vec<SpecDbStruct>
 }
 
 #[derive(Clone)]
-struct SpecDbStruct {
-    name: String,
-    part_type: Type,
+pub struct SpecDbStruct {
+    pub name: String,
+    pub part_type: Type,
     is_part: bool,
 }
 
-#[derive(Clone)]
-pub struct SpecDbFile {
-    file_path: String,
-    contents: String,
-    yaml: Yaml,
-    data: SpecDbStruct
+pub fn get_spec_db(path: String) -> SpecDb {
+    let bah = parse_spec_db_specs(path);
+    let bah2 = bah.get_spec_db();
+    println!("Files with inherits: {}", bah.file_with_inherits.iter().count());
+    println!("Files without inherits: {}", bah.spec_db_files.iter().count());
+    return bah2;
 }
 
-impl SpecDbFile {
-    // fn from_yaml()
-    fn from_file_path(file_path: &String) -> Option<SpecDbFile>
-    {
-        let contents = fs::read_to_string(file_path.clone()).unwrap();
-        println!("{}",file_path.clone().to_string());
-        let parsed_data = YamlLoader::load_from_str(&contents).unwrap()[0].clone();
-        let is_part = match parsed_data["isPart"].as_bool() {
-            Some(is_part) => is_part,
-            None => false,
-        };
-        let part_type = match parsed_data["type"].as_str() {
-            Some(s) => s.to_string(),
-            None => "".to_string(),
-        };
-        let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
-        let release_date = parsed_data["data"]["Release Date"].as_str();
-        let inherits = match parsed_data["inherits"].as_vec() {
-            Some(_) => true,
-            None => false,
-        };
-        if inherits {
-            println!("Ignoring {} for now, will parse when all hidden types are parsed.", part_name)
-        } else {
-
-            println!("Parsing {}", part_name);
-
-            let struct_object = SpecDbStruct {
-                name: part_name.to_owned(),
-                part_type: Type::from_yaml(part_type, &parsed_data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
-                is_part: is_part
-            };
-
-
-            
-            let bah = SpecDbFile {
-                file_path: file_path.clone(),
-                contents: contents.clone(),
-                yaml: YamlLoader::load_from_str(&contents).unwrap()[0].clone(),
-                data: struct_object
-            };
-            return Some(bah);
-        }
-        None
-    }
-
-    fn from_file_path_and_inherit(file_path: &String, mut data: LinkedHashMap<String, Yaml>) -> Option<SpecDbFile>
-    {
-        let contents = fs::read_to_string(file_path.clone()).unwrap();
-        println!("{}",file_path.clone().to_string());
-        let parsed_data = YamlLoader::load_from_str(&contents).unwrap()[0].clone();
-        let is_part = match parsed_data["isPart"].as_bool() {
-            Some(is_part) => is_part,
-            None => false,
-        };
-        let part_type = match parsed_data["type"].as_str() {
-            Some(s) => s.to_string(),
-            None => "".to_string(),
-        };
-        let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
-        let main_data = parsed_data["data"].as_hash().unwrap();
-        for data_element in main_data.iter() {
-            data.insert(data_element.0.as_str().expect("expected string").to_string(), data_element.1.clone());
-        }
-
-        let mut struct_object = SpecDbStruct {
-            name: part_name.to_owned(),
-            part_type: Type::from_hashmap(part_type, data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
-            is_part: is_part
-        };
-        let bah = SpecDbFile {
-            file_path: file_path.clone(),
-            contents: contents.clone(),
-            yaml: YamlLoader::load_from_str(&contents).unwrap()[0].clone(),
-            data: struct_object
-        };
-        return Some(bah);
-    }
+fn parse_spec_db_specs(dir: String) -> SplitSpecDbFiles
+{
+    read_files(dir)
 }
+
+fn read_files(dir:String) -> SplitSpecDbFiles
+{
+    let paths = fs::read_dir(dir).unwrap();
+    let mut spec_db_files:SplitSpecDbFiles = SplitSpecDbFiles::new();
+    for path in paths {
+        match path {
+            Ok(path) => spec_db_files.merge(&mut check_path(path)),
+            Err(error) => print!("Error when getting path: {}",error),
+        }
+    }
+    return spec_db_files;
+}
+
+fn check_path(path: DirEntry) -> SplitSpecDbFiles
+{
+    let mut spec_db_files = SplitSpecDbFiles::new();
+    if path.file_type().unwrap().is_dir() {
+        spec_db_files.merge(&mut read_files(path.path().as_path().to_str().unwrap().to_string()));
+    } else {
+        let path_str = path.path().as_path().to_str().unwrap().to_owned();
+        if !path_str.ends_with("ignore") && !path_str.ends_with("disable") && !path_str.ends_with(".md") {
+            match SpecDbFile::from_file_path(&path_str) {
+                Some(spec_db_bah) => spec_db_files.spec_db_files.push(spec_db_bah),
+                None => {spec_db_files.file_with_inherits.push(path_str)},
+            }
+        }
+    }
+    return spec_db_files;
+}
+
+
 
