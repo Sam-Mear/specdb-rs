@@ -1,9 +1,11 @@
 use hashlink::LinkedHashMap;
+use serde::{Deserialize, Serialize};
 use yaml_rust2::Yaml;
 
 use crate::{data::*, spectype::SpecDbType};
 
 #[derive(Clone)]
+#[derive(Serialize)]
 pub struct GraphicsCard {
     vram_capacity: VramCapacity,
     shader_processor_count: ShaderProcessorCount,

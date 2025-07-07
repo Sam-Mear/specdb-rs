@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 hashlink = "0.10.0"
+serde = { version = "1.0.219", features = ["derive"] }
 yaml-rust2 = "0.10.1"

@@ -1,5 +1,6 @@
 use std::fs::{self, DirEntry};
 
+use serde::{Deserialize, Serialize};
 use yaml_rust2::{Yaml, YamlLoader};
 use hashlink::LinkedHashMap;
 
@@ -9,11 +10,14 @@ pub mod spectype;
 pub mod parser;
 pub mod data;
 
+#[derive(Clone)]
+#[derive(Serialize)]
 pub struct SpecDb {
     pub files: Vec<SpecDbStruct>
 }
 
 #[derive(Clone)]
+#[derive(Serialize)]
 pub struct SpecDbStruct {
     pub name: String,
     pub part_type: Type,

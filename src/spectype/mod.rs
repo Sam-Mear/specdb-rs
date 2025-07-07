@@ -12,12 +12,14 @@ pub use graphics_architecture::GraphicsArchitecture;
 pub use apu_architecture::ApuArchitecture;
 pub use apu::Apu;
 use hashlink::LinkedHashMap;
+use serde::{Deserialize, Serialize};
 use yaml_rust2::Yaml;
 
 
 // todo: turn each one of these enum variants into a struct
 // easy way to tell which type requires what data, and what data are optional.
 #[derive(Clone)]
+#[derive(Serialize)]
 pub enum Type {
     Cpu(Cpu),
     Apu(Apu),

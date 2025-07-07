@@ -1,9 +1,11 @@
 use hashlink::LinkedHashMap;
+use serde::{Deserialize, Serialize};
 use yaml_rust2::Yaml;
 
 use crate::{data::*, spectype::SpecDbType};
 
 #[derive(Clone)]
+#[derive(Serialize)]
 pub struct Apu {
     core_count: CoreCount,
     thread_count: ThreadCount,
