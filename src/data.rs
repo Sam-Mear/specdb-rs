@@ -1,53 +1,101 @@
+use juniper::graphql_scalar;
 use serde::{Deserialize, Serialize};
 
 
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct Lithography {
-  pub value: String
-}
+#[graphql_scalar]
+#[graphql(
+    // Custom GraphQL name.
+    name = "Lithography",
+    // Description can also specified in the attribute.
+    // This will the doc comment, if one exists.
+    description = "",
+    // Optional specification URL.
+    // specified_by_url = "https://tools.ietf.org/html/rfc4122",
+    // Explicit generic scalar.
+    scalar = S: juniper::ScalarValue,
+    transparent,
+)]
+pub struct Lithography (pub String);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct ReleaseDate {
-  pub value: String
-}
+#[graphql_scalar]
+#[graphql(
+    // Custom GraphQL name.
+    name = "Release date",
+    // Description can also specified in the attribute.
+    // This will the doc comment, if one exists.
+    description = "",
+    // Optional specification URL.
+    // specified_by_url = "https://tools.ietf.org/html/rfc4122",
+    // Explicit generic scalar.
+    scalar = S: juniper::ScalarValue,
+    transparent,
+)]
+pub struct ReleaseDate (pub String);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct Sockets {
-  pub value: Vec<String>
-}
+#[graphql_scalar]
+#[graphql(
+    // Custom GraphQL name.
+    name = "Vector of sockets",
+    // Description can also specified in the attribute.
+    // This will the doc comment, if one exists.
+    description = "...",
+    // Optional specification URL.
+    // specified_by_url = "https://tools.ietf.org/html/rfc4122",
+    // Explicit generic scalar.
+    scalar = V: juniper::ScalarValue,
+    transparent,
+)]
+pub struct Sockets (pub Vec<String>);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct CoreCount {
-  pub value: u16
-}
+#[graphql_scalar]
+#[graphql(
+    with = date_scalar,
+    parse_token(String),
+    scalar = CustomScalarValue,
+)]
+pub struct CoreCount (pub u16);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct ThreadCount {
-  pub value: u16
-}
+#[graphql_scalar]
+#[graphql(
+    // Custom GraphQL name.
+    name = "Lithography",
+    // Description can also specified in the attribute.
+    // This will the doc comment, if one exists.
+    description = "",
+    // Optional specification URL.
+    // specified_by_url = "https://tools.ietf.org/html/rfc4122",
+    // Explicit generic scalar.
+    scalar = V: juniper::ScalarValue,
+    transparent,
+)]
+pub struct ThreadCount (pub u16);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct BaseFrequency {
-  pub value: String
-}
+pub struct BaseFrequency (pub String);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct Tdp {
-  pub value: String
-}
+pub struct Tdp (pub String);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct VramCapacity {
-  pub value: String
-}
+pub struct VramCapacity (pub String);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct ShaderProcessorCount {
-  pub value: u32
-}
+pub struct ShaderProcessorCount (pub u32);
+
 #[derive(Clone)]
 #[derive(Serialize)]
-pub struct GpuBaseFrequency {
-  pub value: String
-}
+pub struct GpuBaseFrequency(pub String);

@@ -6,6 +6,7 @@ use crate::{data::*, spectype::SpecDbType};
 
 #[derive(Clone)]
 #[derive(Serialize)]
+#[derive(juniper::GraphQLObject)]
 pub struct GraphicsArchitecture {
     lithography: Lithography,
     release_date: ReleaseDate
@@ -15,8 +16,8 @@ impl SpecDbType for GraphicsArchitecture {
         let lithography = data["Lithography"].as_str().expect("Lithography is required for Cpu Architecture").to_string();
         let release_date = data["Release Date"].as_str().expect("Release Date is required for Cpu Architecture").to_string();
         GraphicsArchitecture {
-            lithography: Lithography { value: lithography },
-            release_date: ReleaseDate { value: release_date }
+            lithography: Lithography ( lithography ),
+            release_date: ReleaseDate ( release_date )
         }
     }
     
@@ -24,8 +25,8 @@ impl SpecDbType for GraphicsArchitecture {
         let lithography = data["Lithography"].as_str().expect("Lithography is required for Cpu Architecture").to_string();
         let release_date = data["Release Date"].as_str().expect("Release Date is required for Cpu Architecture").to_string();
         GraphicsArchitecture {
-            lithography: Lithography { value: lithography },
-            release_date: ReleaseDate { value: release_date }
+            lithography: Lithography ( lithography ),
+            release_date: ReleaseDate ( release_date )
         }
     }
 }
