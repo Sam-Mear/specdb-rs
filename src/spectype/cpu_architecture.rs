@@ -1,3 +1,4 @@
+use async_graphql::SimpleObject;
 use hashlink::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 use yaml_rust2::Yaml;
@@ -6,7 +7,7 @@ use crate::{data::*, spectype::SpecDbType};
 
 #[derive(Clone)]
 #[derive(Serialize)]
-#[derive(juniper::GraphQLObject)]
+#[derive(SimpleObject)]
 pub struct CpuArchitecture {
     lithography: Lithography,
     release_date: ReleaseDate,
@@ -22,9 +23,9 @@ impl SpecDbType for CpuArchitecture {
             sockets.push(socket.as_str().expect("error in socket array. Could it be coming in as an integer?").to_string());
         }
         CpuArchitecture {
-            lithography: Lithography ( lithography ),
-            release_date: ReleaseDate ( release_date ),
-            sockets: Sockets ( sockets )
+            lithography: Lithography { value: lithography },
+            release_date: ReleaseDate { value: release_date },
+            sockets: Sockets { value: sockets }
         }
     }
     
@@ -37,9 +38,9 @@ impl SpecDbType for CpuArchitecture {
             sockets.push(socket.as_str().expect("error in socket array. Could it be coming in as an integer?").to_string());
         }
         CpuArchitecture {
-            lithography: Lithography ( lithography ),
-            release_date: ReleaseDate ( release_date ),
-            sockets: Sockets ( sockets )
+            lithography: Lithography { value: lithography },
+            release_date: ReleaseDate { value: release_date },
+            sockets: Sockets { value: sockets }
         }
     }
 }

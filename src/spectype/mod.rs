@@ -4,24 +4,28 @@ pub mod cpu_architecture;
 pub mod graphics_architecture;
 pub mod apu_architecture;
 pub mod apu;
+pub mod optional_data;
 
+use async_graphql::{Enum, SimpleObject, Union};
 pub use cpu::Cpu;
 pub use graphics_card::GraphicsCard;
 pub use cpu_architecture::CpuArchitecture;
 pub use graphics_architecture::GraphicsArchitecture;
 pub use apu_architecture::ApuArchitecture;
 pub use apu::Apu;
+pub use optional_data::OptionalData;
 use hashlink::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 use yaml_rust2::Yaml;
-use juniper::{GraphQLEnum, GraphQLObject};
+
+use crate::spectype::optional_data::InheritData;
 
 
 // todo: turn each one of these enum variants into a struct
 // easy way to tell which type requires what data, and what data are optional.
 #[derive(Clone)]
 #[derive(Serialize)]
-#[derive(GraphQLEnum)]
+#[derive(Union)]
 pub enum Type {
     Cpu(Cpu),
     Apu(Apu),
@@ -29,8 +33,8 @@ pub enum Type {
     CpuArchitecture(CpuArchitecture),
     ApuArchitecture(ApuArchitecture),
     GraphicsArchitecture(GraphicsArchitecture),
-    GenericContainer,
-    Hidden
+    GenericContainer(OptionalData),
+    Hidden(InheritData)
 }
 
 impl Type {
@@ -55,10 +59,10 @@ impl Type {
             return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_yaml(&parsed_data["data"])));
         }
         if "Generic Container".to_string() == label {
-            return Some(Self::GenericContainer);
+            return Some(Self::GenericContainer(OptionalData{temp: true}));
         }
         if "Hidden".to_string() == label {
-            return Some(Self::Hidden);
+            return Some(Self::Hidden(InheritData { data: OptionalData { temp: true } }));
         }
         return None;
     }
@@ -83,10 +87,10 @@ impl Type {
             return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_hashmap(data)));
         }
         if "Generic Container".to_string() == label {
-            return Some(Self::GenericContainer);
+            return Some(Self::GenericContainer(OptionalData{temp: true}));
         }
         if "Hidden".to_string() == label {
-            return Some(Self::Hidden);
+            return Some(Self::Hidden(InheritData { data: OptionalData { temp: true } }));
         }
         return None;
     }
@@ -98,8 +102,8 @@ impl Type {
             Type::CpuArchitecture(_) => "CPU Architecture".to_string(),
             Type::ApuArchitecture(_) => "APU Architecture".to_string(),
             Type::GraphicsArchitecture(_) => "Graphics Architecture".to_string(),
-            Type::GenericContainer => "Generic Container".to_string(),
-            Type::Hidden => "Hidden".to_string(),
+            Type::GenericContainer(_) => "Generic Container".to_string(),
+            Type::Hidden(_) => "Hidden".to_string(),
         }
     }
 }

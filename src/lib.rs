@@ -1,5 +1,6 @@
 use std::fs::{self, DirEntry};
 
+use async_graphql::SimpleObject;
 use serde::{Deserialize, Serialize};
 use yaml_rust2::{Yaml, YamlLoader};
 use hashlink::LinkedHashMap;
@@ -18,6 +19,7 @@ pub struct SpecDb {
 
 #[derive(Clone)]
 #[derive(Serialize)]
+#[derive(SimpleObject)]
 pub struct SpecDbStruct {
     pub name: String,
     pub part_type: Type,

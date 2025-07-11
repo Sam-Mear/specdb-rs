@@ -167,7 +167,7 @@ impl SplitSpecDbFiles {
     {
         let mut hidden_files = Vec::<SpecDbFile>::new();
         for each in self.spec_db_files.clone().into_iter() {
-            if let Type::Hidden = each.data.part_type {
+            if let Type::Hidden(_) = each.data.part_type {
                 hidden_files.push(each.clone());
             }
         }

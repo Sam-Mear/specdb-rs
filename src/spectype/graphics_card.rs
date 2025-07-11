@@ -1,3 +1,4 @@
+use async_graphql::SimpleObject;
 use hashlink::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 use yaml_rust2::Yaml;
@@ -6,7 +7,7 @@ use crate::{data::*, spectype::SpecDbType};
 
 #[derive(Clone)]
 #[derive(Serialize)]
-#[derive(juniper::GraphQLObject)]
+#[derive(SimpleObject)]
 pub struct GraphicsCard {
     vram_capacity: VramCapacity,
     shader_processor_count: ShaderProcessorCount,
@@ -18,9 +19,9 @@ impl SpecDbType for GraphicsCard {
         let shader_processor_count = data["Shader Processor Count"].as_i64().expect("Shader Processor Count is required for type Graphics Card");
         let gpu_base_frequency = data["GPU Base Frequency"].as_str().expect("GPU Base Frequency is required for type Graphics Card.").to_string();
         GraphicsCard {
-            vram_capacity: VramCapacity(vram_capacity),
-            shader_processor_count: ShaderProcessorCount(u32::try_from(shader_processor_count).expect("Shader processer count too high.")),
-            gpu_base_frequency: GpuBaseFrequency(gpu_base_frequency)
+            vram_capacity: VramCapacity{ value: vram_capacity},
+            shader_processor_count: ShaderProcessorCount{ value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
+            gpu_base_frequency: GpuBaseFrequency{ value: gpu_base_frequency }
         }
     }
     
@@ -35,9 +36,9 @@ impl SpecDbType for GraphicsCard {
                 .expect("GPU Base Frequency is required for type Graphics Card")
                 .as_str().expect("GPU Base Frequency must be string.").to_string();
         GraphicsCard {
-            vram_capacity: VramCapacity ( vram_capacity.to_string() ),
-            shader_processor_count: ShaderProcessorCount ( u32::try_from(shader_processor_count).expect("Shader processer count too high.") ),
-            gpu_base_frequency: GpuBaseFrequency ( gpu_base_frequency )
+            vram_capacity: VramCapacity { value: vram_capacity.to_string() },
+            shader_processor_count: ShaderProcessorCount{ value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
+            gpu_base_frequency: GpuBaseFrequency { value: gpu_base_frequency }
         }
     }
 }
