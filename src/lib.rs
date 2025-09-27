@@ -2,8 +2,6 @@ use std::fs::{self, DirEntry};
 
 use async_graphql::SimpleObject;
 use serde::{Deserialize, Serialize};
-use yaml_rust2::{Yaml, YamlLoader};
-use hashlink::LinkedHashMap;
 
 use crate::{parser::{SpecDbFile, SplitSpecDbFiles}, spectype::Type};
 
@@ -23,7 +21,6 @@ pub struct SpecDb {
 pub struct SpecDbStruct {
     pub name: String,
     pub part_type: Type,
-    is_part: bool,
 }
 
 pub fn get_spec_db(path: String) -> SpecDb {

@@ -20,10 +20,6 @@ impl SpecDbFile {
         let contents = fs::read_to_string(file_path.clone()).unwrap();
         println!("{}",file_path.clone().to_string());
         let parsed_data = YamlLoader::load_from_str(&contents).unwrap()[0].clone();
-        let is_part = match parsed_data["isPart"].as_bool() {
-            Some(is_part) => is_part,
-            None => false,
-        };
         let part_type = match parsed_data["type"].as_str() {
             Some(s) => s.to_string(),
             None => "".to_string(),
@@ -43,7 +39,6 @@ impl SpecDbFile {
             let struct_object = SpecDbStruct {
                 name: part_name.to_owned(),
                 part_type: Type::from_yaml(part_type, &parsed_data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
-                is_part: is_part
             };
 
 
@@ -64,10 +59,6 @@ impl SpecDbFile {
         let contents = fs::read_to_string(file_path.clone()).unwrap();
         println!("{}",file_path.clone().to_string());
         let parsed_data = YamlLoader::load_from_str(&contents).unwrap()[0].clone();
-        let is_part = match parsed_data["isPart"].as_bool() {
-            Some(is_part) => is_part,
-            None => false,
-        };
         let part_type = match parsed_data["type"].as_str() {
             Some(s) => s.to_string(),
             None => "".to_string(),
@@ -78,10 +69,9 @@ impl SpecDbFile {
             data.insert(data_element.0.as_str().expect("expected string").to_string(), data_element.1.clone());
         }
 
-        let mut struct_object = SpecDbStruct {
+        let struct_object = SpecDbStruct {
             name: part_name.to_owned(),
             part_type: Type::from_hashmap(part_type, data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
-            is_part: is_part
         };
         let bah = SpecDbFile {
             file_path: file_path.clone(),
@@ -117,17 +107,13 @@ impl SplitSpecDbFiles {
     pub fn get_spec_db(&self) -> SpecDb
     {
         let mut merged_with_inherit = Vec::<SpecDbStruct>::new();
-        let mut hidden_files = self.get_hidden_types();
+        let hidden_files = self.get_hidden_types();
 
         // let mut merged_files: Vec<>
         for file_path in self.file_with_inherits.clone().into_iter() {
             let contents = fs::read_to_string(file_path.clone()).unwrap();
             println!("{}",file_path.clone().to_string());
             let parsed_data = YamlLoader::load_from_str(&contents).unwrap()[0].clone();
-            let is_part = match parsed_data["isPart"].as_bool() {
-                Some(is_part) => is_part,
-                None => false,
-            };
             let part_type = match parsed_data["type"].as_str() {
                 Some(s) => s.to_string(),
                 None => "".to_string(),
