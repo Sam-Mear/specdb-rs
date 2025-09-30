@@ -21,10 +21,10 @@ impl SpecDbType for Cpu {
         let base_frequency = data["Base Frequency"].as_str().expect("Base Frequency is required for type Cpu").to_string();
         let tdp = data["TDP"].as_str().expect("TDP is required for type Cpu").to_string();
         Cpu {
-            core_count: CoreCount { value: u16::try_from(core_count).expect("Core Count too large") },
-            thread_count: ThreadCount { value: u16::try_from(thread_count).expect("Core Count too large") },
-            base_frequency: BaseFrequency { value: base_frequency },
-            tdp: Tdp { value: tdp }
+            core_count: CoreCount (u16::try_from(core_count).expect("Core Count too large")),
+            thread_count: ThreadCount (u16::try_from(thread_count).expect("Core Count too large")),
+            base_frequency: BaseFrequency (base_frequency),
+            tdp: Tdp (tdp),
         }
     }
     
@@ -37,10 +37,10 @@ impl SpecDbType for Cpu {
         let base_frequency = data.get("Base Frequency").expect("Base Frequency is required for type CPU").as_str().expect("Base Frequency must be string").to_string();
         let tdp = data.get("TDP").expect("TDP is required for type Cpu").as_str().expect("TDP must be string").to_string();
         Cpu {
-            core_count: CoreCount { value: u16::try_from(core_count).expect("Core Count too large") },
-            thread_count: ThreadCount { value: u16::try_from(thread_count).expect("Core Count too large") },
-            base_frequency: BaseFrequency { value: base_frequency },
-            tdp: Tdp { value: tdp }
+            core_count: CoreCount (u16::try_from(core_count).expect("Core Count too large")),
+            thread_count: ThreadCount (u16::try_from(thread_count).expect("Core Count too large")),
+            base_frequency: BaseFrequency (base_frequency),
+            tdp: Tdp (tdp),
         }
     }
 }

@@ -1,7 +1,7 @@
 use std::fs::{self, DirEntry};
 
 use async_graphql::SimpleObject;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize};
 
 use crate::{parser::{SpecDbFile, SplitSpecDbFiles}, spectype::Type};
 

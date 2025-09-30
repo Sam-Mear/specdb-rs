@@ -21,10 +21,10 @@ impl SpecDbType for Apu {
         let base_frequency = data["Base Frequency"].as_str().expect("Base Frequency is required for type Apu").to_string();
         let shader_processor_count = data["Shader Processor Count"].as_i64().expect("Shader Processor Count is required for type Apu");
         Apu {
-            core_count: CoreCount { value: u16::try_from(core_count).expect("Core Count too large") },
-            thread_count: ThreadCount { value: u16::try_from(thread_count).expect("Core Count too large") },
-            base_frequency: BaseFrequency { value: base_frequency },
-            shader_processor_count: ShaderProcessorCount { value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
+            core_count: CoreCount (u16::try_from(core_count).expect("Core Count too large") ),
+            thread_count: ThreadCount (u16::try_from(thread_count).expect("Core Count too large") ),
+            base_frequency: BaseFrequency (base_frequency ),
+            shader_processor_count: ShaderProcessorCount (u32::try_from(shader_processor_count).expect("Shader processer count too high.") ),
         }
     }
     
@@ -43,10 +43,10 @@ impl SpecDbType for Apu {
                 .as_i64().expect("Shader Processor count must be i64");
         
         Apu {
-            core_count: CoreCount { value: u16::try_from(core_count).expect("Core Count too large") },
-            thread_count: ThreadCount { value: u16::try_from(thread_count).expect("Core Count too large") },
-            base_frequency: BaseFrequency { value: base_frequency.to_string() },
-            shader_processor_count: ShaderProcessorCount { value: u32::try_from(shader_processor_count).expect("Shader processer count too high.") },
+            core_count: CoreCount (u16::try_from(core_count).expect("Core Count too large") ),
+            thread_count: ThreadCount (u16::try_from(thread_count).expect("Core Count too large") ),
+            base_frequency: BaseFrequency (base_frequency.to_string() ),
+            shader_processor_count: ShaderProcessorCount (u32::try_from(shader_processor_count).expect("Shader processer count too high.") ),
         }
     }
 }
