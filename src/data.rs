@@ -1,5 +1,6 @@
-use async_graphql::{InputValueResult, Object, Scalar, ScalarType, Value};
+use async_graphql::{InputValueResult, Object, Scalar, ScalarType, SimpleObject, Value};
 use serde::{Deserialize, Serialize};
+use yaml_rust2::Yaml;
 
 
 #[derive(Clone)]
@@ -198,6 +199,69 @@ pub struct Height(pub String);
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct Width(pub String);
+
+
+pub enum SectionError {
+    TypeError { message: String , required: bool},
+}
+
+#[derive(Clone)]
+#[derive(Serialize)]
+#[derive(SimpleObject)]
+pub struct Section {
+    pub header: String,
+    pub members: Vec<String>
+}
+
+impl Section {
+    pub fn from_yaml(data: &Yaml) -> Result<Vec<Self>, SectionError> {
+        // match data["sections"].as_vec() {
+        //     Some(vector) => {
+        //         let mut result = Vec::<Self>::new();
+        //         for section in vector.into_iter(){
+        //             result.push(Section {
+        //                 header: match section["header"].as_str() {
+        //                     Some(value) => return value.to_string(),
+        //                     None => ,
+        //                 },
+        //                 members: () 
+        //             })
+        //         }
+        //     },
+        //     None => return Err("Sections is not an array."),
+        // }
+        
+        let sections = match data["sections"].as_vec() {
+            Some(vector) => {
+                vector
+            },
+            None => return Err(SectionError::TypeError{message: "Sections is not an array.".to_string(), required: false}),
+        };
+        let mut result = Vec::<Self>::new();
+        for section in sections.into_iter(){
+            let header = match section["header"].as_str() {
+                    Some(value) => value.to_string(),
+                    None => return Err(SectionError::TypeError { message: "Header is not a string".to_string(), required: true }),
+            };
+            let members_yaml = match section["members"].as_vec() {
+                Some(value) => value,
+                None => return Err(SectionError::TypeError { message: "Members is not an array for NAMEHERETODO".to_string(), required: true })
+            };
+            let mut members = Vec::<String>::new();
+            for member in members_yaml.into_iter() {
+                members.push(match member.as_str() {
+                    Some(value) => value.to_string(),
+                    None => return Err(SectionError::TypeError { message: "Member is not a string".to_string(), required: true })
+                })
+            }
+            result.push(Section {
+                header: header,
+                members: members
+            })
+        }
+        return Ok(result);
+    }
+}
 
 macro_rules! impl_scalar_string {
     ($name:ident) => {

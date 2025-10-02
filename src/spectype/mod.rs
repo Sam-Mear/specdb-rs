@@ -56,7 +56,7 @@ impl Type {
             return Some(Self::ApuArchitecture(ApuArchitecture::from_yaml(&parsed_data["data"])));
         }
         if "Graphics Architecture".to_string() == label {
-            return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_yaml(&parsed_data["data"])));
+            return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_yaml(&parsed_data)));
         }
         if "Generic Container".to_string() == label {
             return Some(Self::GenericContainer(OptionalData{temp: true}));
