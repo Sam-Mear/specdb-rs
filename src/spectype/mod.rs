@@ -4,6 +4,7 @@ pub mod cpu_architecture;
 pub mod graphics_architecture;
 pub mod apu_architecture;
 pub mod apu;
+pub mod generic_container;
 pub mod optional_data;
 
 use async_graphql::{Enum, SimpleObject, Union};
@@ -13,6 +14,7 @@ pub use cpu_architecture::CpuArchitecture;
 pub use graphics_architecture::GraphicsArchitecture;
 pub use apu_architecture::ApuArchitecture;
 pub use apu::Apu;
+pub use generic_container::GenericContainer;
 pub use optional_data::OptionalData;
 use hashlink::LinkedHashMap;
 use serde::{Deserialize, Serialize};
@@ -33,7 +35,7 @@ pub enum Type {
     CpuArchitecture(CpuArchitecture),
     ApuArchitecture(ApuArchitecture),
     GraphicsArchitecture(GraphicsArchitecture),
-    GenericContainer(OptionalData),
+    GenericContainer(GenericContainer),
     Hidden(InheritData)
 }
 
@@ -50,16 +52,16 @@ impl Type {
             return Some(Self::GraphicsCard(GraphicsCard::from_yaml(&parsed_data["data"])));
         }
         if "CPU Architecture".to_string() == label {
-            return Some(Self::CpuArchitecture(CpuArchitecture::from_yaml(&parsed_data["data"])));
+            return Some(Self::CpuArchitecture(CpuArchitecture::from_yaml(&parsed_data)));
         }
         if "APU Architecture".to_string() == label {
-            return Some(Self::ApuArchitecture(ApuArchitecture::from_yaml(&parsed_data["data"])));
+            return Some(Self::ApuArchitecture(ApuArchitecture::from_yaml(&parsed_data)));
         }
         if "Graphics Architecture".to_string() == label {
             return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_yaml(&parsed_data)));
         }
         if "Generic Container".to_string() == label {
-            return Some(Self::GenericContainer(OptionalData{temp: true}));
+            return Some(Self::GenericContainer(GenericContainer::from_yaml(&parsed_data)));
         }
         if "Hidden".to_string() == label {
             return Some(Self::Hidden(InheritData { data: OptionalData { temp: true } }));
@@ -87,7 +89,7 @@ impl Type {
             return Some(Self::GraphicsArchitecture(GraphicsArchitecture::from_hashmap(data)));
         }
         if "Generic Container".to_string() == label {
-            return Some(Self::GenericContainer(OptionalData{temp: true}));
+            return Some(Self::GenericContainer(GenericContainer::from_hashmap(data)));
         }
         if "Hidden".to_string() == label {
             return Some(Self::Hidden(InheritData { data: OptionalData { temp: true } }));
