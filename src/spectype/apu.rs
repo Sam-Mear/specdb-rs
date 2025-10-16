@@ -39,6 +39,14 @@ pub struct Apu {
 }
 impl SpecDbType for Apu {
     fn from_yaml(data: &Yaml) -> Self {
+        // Helper for Vec<String> fields
+        fn get_vec_string(data: &Yaml, key: &str) -> Option<Vec<String>> {
+            data[key].as_vec().map(|arr| {
+                arr.iter()
+                    .filter_map(|item| item.as_str().map(|s| s.to_string()))
+                    .collect()
+            })
+        }
         let core_count = data["Core Count"].as_i64().expect("Core Count is required for type Apu");
         let thread_count = data["Thread Count"].as_i64().expect("Thread count is required for type Apu");
         let base_frequency = data["Base Frequency"].as_str().expect("Base Frequency is required for type Apu").to_string();
@@ -50,7 +58,7 @@ impl SpecDbType for Apu {
             shader_processor_count: ShaderProcessorCount (u32::try_from(shader_processor_count).expect("Shader processer count too high.") ),
             // GPU Specific
             gpu_base_frequency: match (data["GPU Base Frequency"].as_str()) {
-                Some(value) => Some(value.to_string()),
+                Some(value) => Some(GpuBaseFrequency(value.to_string())),
                 None => None
             },
             ray_tracing_cores: match (data["Ray Tracing Cores"].as_i64()) {
@@ -147,6 +155,25 @@ impl SpecDbType for Apu {
             thread_count: ThreadCount (u16::try_from(thread_count).expect("Core Count too large") ),
             base_frequency: BaseFrequency (base_frequency.to_string() ),
             shader_processor_count: ShaderProcessorCount (u32::try_from(shader_processor_count).expect("Shader processer count too high.") ),
+            gpu_base_frequency: GpuBaseFrequency::from_hashmap(&data),
+            direct_x_support: DirectXSupport::from_hashmap(&data),
+            open_gl_support: OpenGLSupport::from_hashmap(&data),
+            open_cl_support: OpenCLSupport::from_hashmap(&data),
+            vulkan_support: data.get("Vulkan Support").and_then(|v| v.as_str().map(|s| VulkanSupport(s.to_string()))),
+            vram_type: data.get("VRAM Type").and_then(|v| v.as_str().map(|s| VramType(s.to_string()))),
+            render_output_unit_count: data.get("Render Output Unit Count").and_then(|v| v.as_i64().map(|i| RenderOutputUnitCount(u16::try_from(i).expect("Render Output Unit Count must fit into a u16")))),
+            texture_mapping_unit_count: data.get("Texture Mapping Unit Count").and_then(|v| v.as_i64().map(|i| TextureMappingUnitCount(u16::try_from(i).expect("Texture Mapping Unit Count must fit into a u16")))),
+            gpu_boost_frequency: data.get("GPU Boost Freqency").and_then(|v| v.as_str().map(|s| GpuBoostFrequency(s.to_string()))),
+            ray_tracing_cores: todo!(),
+            tensor_cores: todo!(),
+            hardware_accelerated_encoding: todo!(),
+            hardware_accelerated_decoding: todo!(),
+            manufacturer: todo!(),
+            market: todo!(),
+            architecture: todo!(),
+            lithography: todo!(),
+            release_date: todo!(),
+            tdp: todo!(),
         }
     }
 }

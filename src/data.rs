@@ -1,6 +1,7 @@
 use async_graphql::{InputValueResult, Object, Scalar, ScalarType, SimpleObject, Value};
 use serde::{Deserialize, Serialize};
 use yaml_rust2::Yaml;
+use hashlink::LinkedHashMap;
 
 
 #[derive(Clone)]
@@ -263,6 +264,22 @@ impl Section {
     }
 }
 
+macro_rules! impl_from_parser_string {
+    ($name:ident, $yaml_label:expr) => {
+        impl $name {
+            pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
+                return data.get("$yaml_label").and_then(|v| v.as_str().map(|s| $name(s.to_string())));
+            }
+            pub fn from_yaml(data: &Yaml) -> Option<Self> {
+                match data["$yaml_label"].as_str() {
+                    Some(value) => Some($name(value.to_string())),
+                    None => None
+                }
+            }
+        }
+    };
+}
+
 macro_rules! impl_scalar_string {
     ($name:ident) => {
         #[Scalar]
@@ -352,44 +369,72 @@ macro_rules! impl_scalar_vec_string {
 
 
 impl_scalar_string!(Lithography);
+impl_from_parser_string!(Lithography, "Lithography");
 impl_scalar_string!(ReleaseDate);
+impl_from_parser_string!(ReleaseDate, "Release Date");
 impl_scalar_vec_string!(Sockets);
 impl_scalar_u16!(CoreCount);
 impl_scalar_u16!(ThreadCount);
 impl_scalar_string!(BaseFrequency);
+impl_from_parser_string!(BaseFrequency, "Base Frequency");
 impl_scalar_string!(Tdp);
+impl_from_parser_string!(Tdp, "TDP");
 impl_scalar_string!(VramCapacity);
+impl_from_parser_string!(VramCapacity, "VRAM Capacity");
 impl_scalar_u32!(ShaderProcessorCount);
 impl_scalar_string!(GpuBaseFrequency);
+impl_from_parser_string!(GpuBaseFrequency, "GPU Base Frequency");
 impl_scalar_string!(Manufacturer);
+impl_from_parser_string!(Manufacturer, "Manufacturer");
 impl_scalar_string!(Vendor);
+impl_from_parser_string!(Vendor, "Vendor");
 impl_scalar_string!(Architecture);
+impl_from_parser_string!(Architecture, "Architecture");
 impl_scalar_u16!(TensorCores);
 impl_scalar_u16!(RayTracingCores);
 impl_scalar_string!(DirectXSupport);
+impl_from_parser_string!(DirectXSupport, "DirectX Support");
 impl_scalar_string!(OpenGLSupport);
+impl_from_parser_string!(OpenGLSupport, "OpenGL Support");
 impl_scalar_string!(OpenCLSupport);
+impl_from_parser_string!(OpenCLSupport, "OpenCL Support");
 impl_scalar_string!(VulkanSupport);
+impl_from_parser_string!(VulkanSupport, "Vulkan Support");
 impl_scalar_vec_string!(Market);
 impl_scalar_vec_string!(HardwareAcceleratedEncoding);
 impl_scalar_vec_string!(HardwareAcceleratedDecoding);
 impl_scalar_vec_string!(PowerConnectors);
 impl_scalar_vec_string!(Outputs);
 impl_scalar_string!(VramFrequency);
+impl_from_parser_string!(VramFrequency, "VRAM Frequency");
 impl_scalar_string!(VramType);
+impl_from_parser_string!(VramType, "VRAM Type");
 impl_scalar_string!(VramBandwidth);
+impl_from_parser_string!(VramBandwidth, "VRAM Bandwidth");
 impl_scalar_string!(VramBusWidth);
+impl_from_parser_string!(VramBusWidth, "VRAM Bus Width");
 impl_scalar_u16!(RenderOutputUnitCount);
 impl_scalar_u16!(TextureMappingUnitCount);
 impl_scalar_string!(DieSize);
+impl_from_parser_string!(DieSize, "Die Size");
 impl_scalar_string!(Gpu);
+impl_from_parser_string!(Gpu, "GPU");
 impl_scalar_string!(GpuVariant);
+impl_from_parser_string!(GpuVariant, "GPU Variant");
 impl_scalar_string!(HlslShaderModel);
+impl_from_parser_string!(HlslShaderModel, "HLSL Shader Model");
 impl_scalar_string!(GpuBoostFrequency);
+impl_from_parser_string!(GpuBoostFrequency, "GPU Boost Frequency");
 impl_scalar_string!(FP32Compute);
+impl_from_parser_string!(FP32Compute, "FP32 Compute");
 impl_scalar_string!(FP64Compute);
+impl_from_parser_string!(FP64Compute, "FP64 Compute");
 impl_scalar_string!(SlotWidth);
+impl_from_parser_string!(SlotWidth, "Slot Width");
 impl_scalar_string!(Length);
+impl_from_parser_string!(Length, "Length");
 impl_scalar_string!(Height);
+impl_from_parser_string!(Height, "Height");
 impl_scalar_string!(Width);
+impl_from_parser_string!(Width, "Width");
 
