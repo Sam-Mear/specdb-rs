@@ -25,7 +25,6 @@ impl SpecDbFile {
             None => "".to_string(),
         };
         let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
-        let release_date = parsed_data["data"]["Release Date"].as_str();
         let inherits = match parsed_data["inherits"].as_vec() {
             Some(_) => true,
             None => false,
@@ -114,12 +113,6 @@ impl SplitSpecDbFiles {
             let contents = fs::read_to_string(file_path.clone()).unwrap();
             println!("{}",file_path.clone().to_string());
             let parsed_data = YamlLoader::load_from_str(&contents).unwrap()[0].clone();
-            let part_type = match parsed_data["type"].as_str() {
-                Some(s) => s.to_string(),
-                None => "".to_string(),
-            };
-            let part_name = parsed_data["name"].as_str().expect(format!("Missing required name. Or it is not a string. File: {}", file_path).as_str());
-            let release_date = parsed_data["data"]["Release Date"].as_str();
             let mut data = LinkedHashMap::<String, Yaml>::new();
             let inherits = parsed_data["inherits"].as_vec().expect("Expected array in inherits");
             for inherit_name in inherits {
