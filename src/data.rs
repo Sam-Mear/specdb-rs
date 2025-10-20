@@ -264,6 +264,68 @@ impl Section {
     }
 }
 
+macro_rules! impl_from_parser_u32 {
+    ($name:ident, $yaml_label:expr) => {
+        impl $name {
+            pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
+                return data.get("$yaml_label").and_then(|v| v.as_i64().map(|num| {
+                    $name(u32::try_from(num).expect("Value too large"))
+                }));
+            }
+            pub fn from_yaml(data: &Yaml) -> Option<Self> {
+                match data["$yaml_label"].as_i64() {
+                    Some(value) => Some($name(u32::try_from(value).expect("Value too large"))),
+                    None => None
+                }
+            }
+        }
+    };
+}
+
+macro_rules! impl_from_parser_u16 {
+    ($name:ident, $yaml_label:expr) => {
+        impl $name {
+            pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
+                return data.get("$yaml_label").and_then(|v| v.as_i64().map(|num| {
+                    $name(u16::try_from(num).expect("Value too large"))
+                }));
+            }
+            pub fn from_yaml(data: &Yaml) -> Option<Self> {
+                match data["$yaml_label"].as_i64() {
+                    Some(value) => Some($name(u16::try_from(value).expect("Value too large"))),
+                    None => None
+                }
+            }
+        }
+    };
+}
+
+macro_rules! impl_from_parser_vec_string {
+    ($name:ident, $yaml_label:expr) => {
+        impl $name {
+            pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
+                return data.get("$yaml_label").and_then(|v| v.as_vec().map(|arr| {
+                    let items: Vec<String> = arr.iter()
+                        .filter_map(|item| item.as_str().map(|s| s.to_string()))
+                        .collect();
+                    $name(items)
+                }));
+            }
+            pub fn from_yaml(data: &Yaml) -> Option<Self> {
+                match data["$yaml_label"].as_vec() {
+                    Some(arr) => {
+                        let items: Vec<String> = arr.iter()
+                            .filter_map(|item| item.as_str().map(|s| s.to_string()))
+                            .collect();
+                        Some($name(items))
+                    },
+                    None => None
+                }
+            }
+        }
+    };
+}
+
 macro_rules! impl_from_parser_string {
     ($name:ident, $yaml_label:expr) => {
         impl $name {
@@ -373,8 +435,11 @@ impl_from_parser_string!(Lithography, "Lithography");
 impl_scalar_string!(ReleaseDate);
 impl_from_parser_string!(ReleaseDate, "Release Date");
 impl_scalar_vec_string!(Sockets);
+impl_from_parser_vec_string!(Sockets, "Sockets");
 impl_scalar_u16!(CoreCount);
+impl_from_parser_u16!(CoreCount, "Core Count");
 impl_scalar_u16!(ThreadCount);
+impl_from_parser_u16!(ThreadCount, "Thread Count");
 impl_scalar_string!(BaseFrequency);
 impl_from_parser_string!(BaseFrequency, "Base Frequency");
 impl_scalar_string!(Tdp);
@@ -382,6 +447,7 @@ impl_from_parser_string!(Tdp, "TDP");
 impl_scalar_string!(VramCapacity);
 impl_from_parser_string!(VramCapacity, "VRAM Capacity");
 impl_scalar_u32!(ShaderProcessorCount);
+impl_from_parser_u32!(ShaderProcessorCount, "Shader Processor Count");
 impl_scalar_string!(GpuBaseFrequency);
 impl_from_parser_string!(GpuBaseFrequency, "GPU Base Frequency");
 impl_scalar_string!(Manufacturer);
@@ -391,7 +457,9 @@ impl_from_parser_string!(Vendor, "Vendor");
 impl_scalar_string!(Architecture);
 impl_from_parser_string!(Architecture, "Architecture");
 impl_scalar_u16!(TensorCores);
+impl_from_parser_u16!(TensorCores, "Tensor Cores");
 impl_scalar_u16!(RayTracingCores);
+impl_from_parser_u16!(RayTracingCores, "Ray Tracing Cores");
 impl_scalar_string!(DirectXSupport);
 impl_from_parser_string!(DirectXSupport, "DirectX Support");
 impl_scalar_string!(OpenGLSupport);
@@ -401,10 +469,15 @@ impl_from_parser_string!(OpenCLSupport, "OpenCL Support");
 impl_scalar_string!(VulkanSupport);
 impl_from_parser_string!(VulkanSupport, "Vulkan Support");
 impl_scalar_vec_string!(Market);
+impl_from_parser_vec_string!(Market, "Market");
 impl_scalar_vec_string!(HardwareAcceleratedEncoding);
+impl_from_parser_vec_string!(HardwareAcceleratedEncoding, "Hardware Accelerated Encoding");
 impl_scalar_vec_string!(HardwareAcceleratedDecoding);
+impl_from_parser_vec_string!(HardwareAcceleratedDecoding, "Hardware Accelerated Decoding");
 impl_scalar_vec_string!(PowerConnectors);
+impl_from_parser_vec_string!(PowerConnectors, "Power Connectors");
 impl_scalar_vec_string!(Outputs);
+impl_from_parser_vec_string!(Outputs, "Outputs");
 impl_scalar_string!(VramFrequency);
 impl_from_parser_string!(VramFrequency, "VRAM Frequency");
 impl_scalar_string!(VramType);
@@ -414,7 +487,9 @@ impl_from_parser_string!(VramBandwidth, "VRAM Bandwidth");
 impl_scalar_string!(VramBusWidth);
 impl_from_parser_string!(VramBusWidth, "VRAM Bus Width");
 impl_scalar_u16!(RenderOutputUnitCount);
+impl_from_parser_u16!(RenderOutputUnitCount, "Render Output Unit Count");
 impl_scalar_u16!(TextureMappingUnitCount);
+impl_from_parser_u16!(TextureMappingUnitCount, "Texture Mapping Unit Count");
 impl_scalar_string!(DieSize);
 impl_from_parser_string!(DieSize, "Die Size");
 impl_scalar_string!(Gpu);
