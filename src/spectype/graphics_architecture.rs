@@ -1,6 +1,6 @@
 use async_graphql::SimpleObject;
 use hashlink::LinkedHashMap;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use yaml_rust2::Yaml;
 
 use crate::{data::*, spectype::SpecDbType};
@@ -29,7 +29,7 @@ impl SpecDbType for GraphicsArchitecture {
             sections: sections,
             lithography: Lithography (lithography),
             release_date: ReleaseDate (release_date),
-            manufacturer: match (data["Manufacturer"].as_str()) {
+            manufacturer: match data["Manufacturer"].as_str() {
                 Some(value) => Some( Manufacturer(value.to_string())),
                 None => None
             },
@@ -51,7 +51,7 @@ impl SpecDbType for GraphicsArchitecture {
             sections: todo!(),
             lithography: Lithography (lithography),
             release_date: ReleaseDate (release_date),
-            manufacturer: match (data.get("Manufacturer")) {
+            manufacturer: match data.get("Manufacturer") {
                 Some(value) => Some(Manufacturer(value.as_str().expect("Manufacturer must be a string").to_string())),
                 None => None
             },

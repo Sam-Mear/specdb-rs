@@ -1,6 +1,6 @@
 use async_graphql::SimpleObject;
 use hashlink::LinkedHashMap;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use yaml_rust2::Yaml;
 
 use crate::{data::*, spectype::SpecDbType};
@@ -57,15 +57,15 @@ impl SpecDbType for Apu {
             base_frequency: BaseFrequency (base_frequency ),
             shader_processor_count: ShaderProcessorCount (u32::try_from(shader_processor_count).expect("Shader processer count too high.") ),
             // GPU Specific
-            gpu_base_frequency: match (data["GPU Base Frequency"].as_str()) {
+            gpu_base_frequency: match data["GPU Base Frequency"].as_str() {
                 Some(value) => Some(GpuBaseFrequency(value.to_string())),
                 None => None
             },
-            ray_tracing_cores: match (data["Ray Tracing Cores"].as_i64()) {
+            ray_tracing_cores: match data["Ray Tracing Cores"].as_i64() {
                 Some(value) => Some(RayTracingCores(u16::try_from(value).expect("Ray Tracing Cores does not fit in u16"))),
                 None => None
             },
-            tensor_cores: match (data["Tensor Cores"].as_i64()) {
+            tensor_cores: match data["Tensor Cores"].as_i64() {
                 Some(value) => Some(TensorCores(u16::try_from(value).expect("Tensor Cores does not fit into u16"))),
                 None => None
             },
@@ -112,23 +112,23 @@ impl SpecDbType for Apu {
             hardware_accelerated_encoding: get_vec_string(data, "Hardware Accelerated Encoding").map(HardwareAcceleratedEncoding),
             hardware_accelerated_decoding: get_vec_string(data, "Hardware Accelerated Decoding").map(HardwareAcceleratedDecoding),
             // Shared
-            manufacturer: match (data["Manufacturer"].as_str()) {
+            manufacturer: match data["Manufacturer"].as_str() {
                 Some(value) => Some( Manufacturer(value.to_string())),
                 None => None
             },
-            architecture: match (data["Architecture"].as_str()) {
+            architecture: match data["Architecture"].as_str() {
                 Some(value) => Some(Architecture(value.to_string())),
                 None => None
             },
-            lithography: match (data["Lithography"].as_str()) {
+            lithography: match data["Lithography"].as_str() {
                 Some(value) => Some(Lithography(value.to_string())),
                 None => None
             },
-            release_date: match (data["Release Date"].as_str()) {
+            release_date: match data["Release Date"].as_str() {
                 Some(value) => Some(ReleaseDate(value.to_string())),
                 None => None
             },
-            tdp: match (data["TDP"].as_str()) {
+            tdp: match data["TDP"].as_str() {
                 Some(value) => Some(Tdp(value.to_string())),
                 None => None
             },

@@ -1,5 +1,5 @@
-use async_graphql::{InputValueResult, Object, Scalar, ScalarType, SimpleObject, Value};
-use serde::{Deserialize, Serialize};
+use async_graphql::{InputValueResult, Scalar, ScalarType, SimpleObject, Value};
+use serde::Serialize;
 use yaml_rust2::Yaml;
 use hashlink::LinkedHashMap;
 

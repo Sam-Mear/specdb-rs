@@ -1,9 +1,9 @@
 use async_graphql::SimpleObject;
 use hashlink::LinkedHashMap;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use yaml_rust2::Yaml;
 
-use crate::{data::*, spectype::SpecDbType};
+use crate::spectype::SpecDbType;
 
 
 #[derive(Clone)]

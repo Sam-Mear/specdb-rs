@@ -7,7 +7,7 @@ pub mod apu;
 pub mod generic_container;
 pub mod optional_data;
 
-use async_graphql::{Enum, SimpleObject, Union};
+use async_graphql::Union;
 pub use cpu::Cpu;
 pub use graphics_card::GraphicsCard;
 pub use cpu_architecture::CpuArchitecture;
@@ -17,7 +17,7 @@ pub use apu::Apu;
 pub use generic_container::GenericContainer;
 pub use optional_data::OptionalData;
 use hashlink::LinkedHashMap;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use yaml_rust2::Yaml;
 
 use crate::spectype::optional_data::InheritData;

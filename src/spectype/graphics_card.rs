@@ -1,6 +1,6 @@
 use async_graphql::SimpleObject;
 use hashlink::LinkedHashMap;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use yaml_rust2::Yaml;
 
 use crate::{data::*, spectype::SpecDbType};
@@ -66,35 +66,35 @@ impl SpecDbType for GraphicsCard {
             vram_capacity: VramCapacity(vram_capacity),
             shader_processor_count: ShaderProcessorCount(u32::try_from(shader_processor_count).expect("Shader processer count too high.") ),
             gpu_base_frequency: GpuBaseFrequency(gpu_base_frequency ),
-            manufacturer: match (data["Manufacturer"].as_str()) {
+            manufacturer: match data["Manufacturer"].as_str() {
                 Some(value) => Some( Manufacturer(value.to_string())),
                 None => None
             },
-            vendor: match (data["Vendor"].as_str()) {
+            vendor: match data["Vendor"].as_str() {
                 Some(value) => Some(Vendor(value.to_string())),
                 None => None
             },
-            architecture: match (data["Architecture"].as_str()) {
+            architecture: match data["Architecture"].as_str() {
                 Some(value) => Some(Architecture(value.to_string())),
                 None => None
             },
-            lithography: match (data["Lithography"].as_str()) {
+            lithography: match data["Lithography"].as_str() {
                 Some(value) => Some(Lithography(value.to_string())),
                 None => None
             },
-            release_date: match (data["Release Date"].as_str()) {
+            release_date: match data["Release Date"].as_str() {
                 Some(value) => Some(ReleaseDate(value.to_string())),
                 None => None
             },
-            tdp: match (data["TDP"].as_str()) {
+            tdp: match data["TDP"].as_str() {
                 Some(value) => Some(Tdp(value.to_string())),
                 None => None
             },
-            ray_tracing_cores: match (data["Ray Tracing Cores"].as_i64()) {
+            ray_tracing_cores: match data["Ray Tracing Cores"].as_i64() {
                 Some(value) => Some(RayTracingCores(u16::try_from(value).expect("Ray Tracing Cores does not fit in u16"))),
                 None => None
             },
-            tensor_cores: match (data["Tensor Cores"].as_i64()) {
+            tensor_cores: match data["Tensor Cores"].as_i64() {
                 Some(value) => Some(TensorCores(u16::try_from(value).expect("Tensor Cores does not fit into u16"))),
                 None => None
             },
@@ -215,35 +215,35 @@ impl SpecDbType for GraphicsCard {
             vram_capacity: VramCapacity (vram_capacity.to_string()),
             shader_processor_count: ShaderProcessorCount(u32::try_from(shader_processor_count).expect("Shader processer count too high.")),
             gpu_base_frequency: GpuBaseFrequency (gpu_base_frequency),
-            manufacturer: match (data.get("Manufacturer")) {
+            manufacturer: match data.get("Manufacturer") {
                 Some(value) => Some(Manufacturer(value.as_str().expect("Manufacturer must be a string").to_string())),
                 None => None
             },
-            vendor: match (data.get("Vendor")) {
+            vendor: match data.get("Vendor") {
                 Some(value) => Some(Vendor(value.as_str().expect("Vendor must be a string").to_string())),
                 None => None
             },
-            architecture: match (data.get("Architecture")) {
+            architecture: match data.get("Architecture") {
                 Some(value) => Some(Architecture(value.as_str().expect("Architecture must be a string").to_string())),
                 None => None
             },
-            lithography: match (data.get("Lithography")) {
+            lithography: match data.get("Lithography") {
                 Some(value) => Some(Lithography(value.as_str().expect("Lithography must be a string").to_string())),
                 None => None
             },
-            release_date: match (data.get("Release Date")) {
+            release_date: match data.get("Release Date") {
                 Some(value) => Some(ReleaseDate(value.as_str().expect("Release Date must be a string").to_string())),
                 None => None
             },
-            tdp: match (data.get("TDP")) {
+            tdp: match data.get("TDP") {
                 Some(value) => Some(Tdp(value.as_str().expect("Value must be a string").to_string())),
                 None => None
             },
-            ray_tracing_cores: match (data.get("Ray Tracing Cores")) {
+            ray_tracing_cores: match data.get("Ray Tracing Cores") {
                 Some(value) => Some(RayTracingCores(u16::try_from(value.as_i64().expect("Ray Tracing Cores must be i64")).expect("Ray Tracing Cores must fit into a u16"))),
                 None => None
             },
-            tensor_cores: match (data.get("Tensor Cores")) {
+            tensor_cores: match data.get("Tensor Cores") {
                 Some(value) => Some(TensorCores(u16::try_from(value.as_i64().expect("Tensor Cores must be i64")).expect("Tensor Cores must fit into a u16"))),
                 None => None
             },
