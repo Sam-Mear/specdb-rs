@@ -201,6 +201,87 @@ pub struct Height(pub String);
 #[derive(Serialize)]
 pub struct Width(pub String);
 
+#[derive(Clone, Serialize)]
+pub struct BoostFrequency(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct XfrFrequency(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct Socket(pub String);
+
+
+#[derive(Clone, Serialize)]
+pub struct Stepping(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct L1CacheData(pub String);
+
+
+#[derive(Clone, Serialize)]
+pub struct L1CacheInstruction(pub String);
+
+
+#[derive(Clone, Serialize)]
+pub struct L2CacheTotal(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct L3CacheTotal(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct MemoryType(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct Pcie10Lanes(pub u32);
+
+#[derive(Clone, Serialize)]
+pub struct Pcie20Lanes(pub u32);
+
+#[derive(Clone, Serialize)]
+pub struct Pcie30Lanes(pub u32);
+
+#[derive(Clone, Serialize)]
+pub struct Pcie40Lanes(pub u32);
+
+#[derive(Clone, Serialize)]
+pub struct Pcie50Lanes(pub u32);
+
+#[derive(Clone, Serialize)]
+pub struct AvxSseMmx(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct Fma4(pub bool);
+
+#[derive(Clone, Serialize)]
+pub struct Fma3(pub bool);
+
+#[derive(Clone, Serialize)]
+pub struct Bmi(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct Aes(pub bool);
+
+#[derive(Clone, Serialize)]
+pub struct Sha(pub bool);
+
+#[derive(Clone, Serialize)]
+pub struct OtherExtensions(pub Vec<String>);
+
+#[derive(Clone, Serialize)]
+pub struct Unlocked(pub bool);
+
+#[derive(Clone, Serialize)]
+pub struct XfrSupport(pub bool);
+
+#[derive(Clone, Serialize)]
+pub struct MaxMemoryFrequency(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct MaxMemoryChannels(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct CompatableChipsets(pub Vec<String>);
+
 
 pub enum SectionError {
     TypeError { message: String , required: bool},
@@ -268,12 +349,12 @@ macro_rules! impl_from_parser_u32 {
     ($name:ident, $yaml_label:expr) => {
         impl $name {
             pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
-                return data.get("$yaml_label").and_then(|v| v.as_i64().map(|num| {
+                return data.get($yaml_label).and_then(|v| v.as_i64().map(|num| {
                     $name(u32::try_from(num).expect("Value too large"))
                 }));
             }
             pub fn from_yaml(data: &Yaml) -> Option<Self> {
-                match data["$yaml_label"].as_i64() {
+                match data[$yaml_label].as_i64() {
                     Some(value) => Some($name(u32::try_from(value).expect("Value too large"))),
                     None => None
                 }
@@ -286,12 +367,12 @@ macro_rules! impl_from_parser_u16 {
     ($name:ident, $yaml_label:expr) => {
         impl $name {
             pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
-                return data.get("$yaml_label").and_then(|v| v.as_i64().map(|num| {
+                return data.get($yaml_label).and_then(|v| v.as_i64().map(|num| {
                     $name(u16::try_from(num).expect("Value too large"))
                 }));
             }
             pub fn from_yaml(data: &Yaml) -> Option<Self> {
-                match data["$yaml_label"].as_i64() {
+                match data[$yaml_label].as_i64() {
                     Some(value) => Some($name(u16::try_from(value).expect("Value too large"))),
                     None => None
                 }
@@ -304,7 +385,7 @@ macro_rules! impl_from_parser_vec_string {
     ($name:ident, $yaml_label:expr) => {
         impl $name {
             pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
-                return data.get("$yaml_label").and_then(|v| v.as_vec().map(|arr| {
+                return data.get($yaml_label).and_then(|v| v.as_vec().map(|arr| {
                     let items: Vec<String> = arr.iter()
                         .filter_map(|item| item.as_str().map(|s| s.to_string()))
                         .collect();
@@ -312,7 +393,7 @@ macro_rules! impl_from_parser_vec_string {
                 }));
             }
             pub fn from_yaml(data: &Yaml) -> Option<Self> {
-                match data["$yaml_label"].as_vec() {
+                match data[$yaml_label].as_vec() {
                     Some(arr) => {
                         let items: Vec<String> = arr.iter()
                             .filter_map(|item| item.as_str().map(|s| s.to_string()))
@@ -330,11 +411,27 @@ macro_rules! impl_from_parser_string {
     ($name:ident, $yaml_label:expr) => {
         impl $name {
             pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
-                return data.get("$yaml_label").and_then(|v| v.as_str().map(|s| $name(s.to_string())));
+                return data.get($yaml_label).and_then(|v| v.as_str().map(|s| $name(s.to_string())));
             }
             pub fn from_yaml(data: &Yaml) -> Option<Self> {
-                match data["$yaml_label"].as_str() {
+                match data[$yaml_label].as_str() {
                     Some(value) => Some($name(value.to_string())),
+                    None => None
+                }
+            }
+        }
+    };
+}
+
+macro_rules! impl_from_parser_bool {
+    ($name:ident, $yaml_label:expr) => {
+        impl $name {
+            pub fn from_hashmap(data: &LinkedHashMap<String, Yaml>) -> Option<Self> {
+                return data.get($yaml_label).and_then(|v| v.as_bool().map(|b| $name(b)));
+            }
+            pub fn from_yaml(data: &Yaml) -> Option<Self> {
+                match data[$yaml_label].as_bool() {
+                    Some(value) => Some($name(value)),
                     None => None
                 }
             }
@@ -355,6 +452,24 @@ macro_rules! impl_scalar_string {
             }
             fn to_value(&self) -> Value {
                 Value::String(self.0.to_owned())
+            }
+        }
+    };
+}
+
+macro_rules! impl_scalar_bool {
+    ($name:ident) => {
+        #[Scalar]
+        impl ScalarType for $name {
+            fn parse(value: Value) -> InputValueResult<Self> {
+                if let Value::Boolean(b) = &value {
+                    Ok($name(*b))
+                } else {
+                    Err(format!("Invalid value for {}", stringify!($name)).into())
+                }
+            }
+            fn to_value(&self) -> Value {
+                Value::Boolean(self.0)
             }
         }
     };
@@ -512,4 +627,55 @@ impl_scalar_string!(Height);
 impl_from_parser_string!(Height, "Height");
 impl_scalar_string!(Width);
 impl_from_parser_string!(Width, "Width");
-
+impl_scalar_string!(BoostFrequency);
+impl_from_parser_string!(BoostFrequency, "Boost Frequency");
+impl_scalar_string!(XfrFrequency);
+impl_from_parser_string!(XfrFrequency, "XFR Frequency");
+impl_scalar_string!(Socket);
+impl_from_parser_string!(Socket, "Socket");
+impl_scalar_string!(Stepping);
+impl_from_parser_string!(Stepping, "Stepping");
+impl_scalar_string!(L1CacheData);
+impl_from_parser_string!(L1CacheData, "L1 Cache (Data)");
+impl_scalar_string!(L1CacheInstruction);
+impl_from_parser_string!(L1CacheInstruction, "L1 Cache (Instruction)");
+impl_scalar_string!(L2CacheTotal);
+impl_from_parser_string!(L2CacheTotal, "L2 Cache (Total)");
+impl_scalar_string!(L3CacheTotal);
+impl_from_parser_string!(L3CacheTotal, "L3 Cache (Total)");
+impl_scalar_string!(MemoryType);
+impl_from_parser_string!(MemoryType, "Memory Type");
+impl_scalar_u32!(Pcie10Lanes);
+impl_from_parser_u32!(Pcie10Lanes, "PCIe 1.0 Lanes");
+impl_scalar_u32!(Pcie20Lanes);
+impl_from_parser_u32!(Pcie20Lanes, "PCIe 2.0 Lanes");
+impl_scalar_u32!(Pcie30Lanes);
+impl_from_parser_u32!(Pcie30Lanes, "PCIe 3.0 Lanes");
+impl_scalar_u32!(Pcie40Lanes);
+impl_from_parser_u32!(Pcie40Lanes, "PCIe 4.0 Lanes");
+impl_scalar_u32!(Pcie50Lanes);
+impl_from_parser_u32!(Pcie50Lanes, "PCIe 5.0 Lanes");
+impl_scalar_string!(AvxSseMmx);
+impl_from_parser_string!(AvxSseMmx, "AVX/SSE/MMX");
+impl_scalar_bool!(Fma4);
+impl_from_parser_bool!(Fma4, "FMA4");
+impl_scalar_bool!(Fma3);
+impl_from_parser_bool!(Fma3, "FMA3");
+impl_scalar_string!(Bmi);
+impl_from_parser_string!(Bmi, "BMI");
+impl_scalar_bool!(Aes);
+impl_from_parser_bool!(Aes, "AES");
+impl_scalar_bool!(Sha);
+impl_from_parser_bool!(Sha, "SHA");
+impl_scalar_vec_string!(OtherExtensions);
+impl_from_parser_vec_string!(OtherExtensions, "Other Extensions");
+impl_scalar_bool!(Unlocked);
+impl_from_parser_bool!(Unlocked, "Unlocked");
+impl_scalar_bool!(XfrSupport);
+impl_from_parser_bool!(XfrSupport, "XFR Support");
+impl_scalar_string!(MaxMemoryFrequency);
+impl_from_parser_string!(MaxMemoryFrequency, "Max Memory Frequency");
+impl_scalar_string!(MaxMemoryChannels);
+impl_from_parser_string!(MaxMemoryChannels, "Max Memory Channels");
+impl_scalar_vec_string!(CompatableChipsets);
+impl_from_parser_vec_string!(CompatableChipsets, "Compatable Chipsets");
