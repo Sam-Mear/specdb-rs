@@ -1,7 +1,7 @@
 use std::fs::{self, DirEntry};
 
-use yaml_rust2::{Yaml, YamlLoader};
-use hashlink::LinkedHashMap;
+use async_graphql::SimpleObject;
+use serde::{Serialize};
 
 use crate::{parser::{SpecDbFile, SplitSpecDbFiles}, spectype::Type};
 
@@ -9,15 +9,18 @@ pub mod spectype;
 pub mod parser;
 pub mod data;
 
+#[derive(Clone)]
+#[derive(Serialize)]
 pub struct SpecDb {
     pub files: Vec<SpecDbStruct>
 }
 
 #[derive(Clone)]
+#[derive(Serialize)]
+#[derive(SimpleObject)]
 pub struct SpecDbStruct {
     pub name: String,
     pub part_type: Type,
-    is_part: bool,
 }
 
 pub fn get_spec_db(path: String) -> SpecDb {
