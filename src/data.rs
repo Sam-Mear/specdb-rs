@@ -29,9 +29,36 @@ pub struct ThreadCount (pub u16);
 #[derive(Serialize)]
 pub struct BaseFrequency (pub String);
 
+#[derive(Clone, Serialize)]
+pub struct PerformanceCoreBaseFrequency (pub String);
+
+#[derive(Clone, Serialize)]
+pub struct EfficientCoreBaseFrequency (pub String);
+
+#[derive(Clone, Serialize)]
+pub struct PerformanceCoreBoostFrequency (pub String);
+
+#[derive(Clone, Serialize)]
+pub struct EfficientCoreBoostFrequency (pub String);
+
+#[derive(Clone, Serialize)]
+pub struct PerformanceCoreCount (pub u16);
+
+#[derive(Clone, Serialize)]
+pub struct EfficientCoreCount (pub u16);
+
+#[derive(Clone, Serialize)]
+pub struct PerformanceThreadCount (pub u16);
+
+#[derive(Clone, Serialize)]
+pub struct EfficientThreadCount (pub u16);
+
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct Tdp (pub String);
+
+#[derive(Clone, Serialize)]
+pub struct CtdpSupport (pub bool);
 
 #[derive(Clone)]
 #[derive(Serialize)]
@@ -57,6 +84,9 @@ pub struct Vendor(pub String);
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct Architecture(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct EfficientCoreArchitecture(pub String);
 
 
 #[derive(Clone)]
@@ -96,8 +126,6 @@ pub struct VulkanSupport(pub String);
 #[derive(Serialize)]
 pub struct Market(pub Vec<String>);
 
-
-
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct HardwareAcceleratedEncoding(pub Vec<String>);
@@ -131,31 +159,28 @@ pub struct VramType(pub String);
 #[derive(Serialize)]
 pub struct VramBandwidth(pub String);
 
-
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct VramBusWidth(pub String);
-
 
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct RenderOutputUnitCount(pub u16);
 
-
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct TextureMappingUnitCount(pub u16);
-
 
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct DieSize(pub String);
 
-
 #[derive(Clone)]
 #[derive(Serialize)]
 pub struct Gpu(pub String);
 
+#[derive(Clone, Serialize)]
+pub struct GpuModel(pub String);
 
 #[derive(Clone)]
 #[derive(Serialize)]
@@ -281,6 +306,24 @@ pub struct MaxMemoryChannels(pub String);
 
 #[derive(Clone, Serialize)]
 pub struct CompatableChipsets(pub Vec<String>);
+
+#[derive(Clone, Serialize)]
+pub struct ModuleCount(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct PixelShaders(pub u16);
+
+#[derive(Clone, Serialize)]
+pub struct MaximumVramCapacity(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct MaxDisplays(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct CrossfireSupport(pub String);
+
+#[derive(Clone, Serialize)]
+pub struct FreeSyncSupport(pub String);
 
 
 pub enum SectionError {
@@ -679,3 +722,37 @@ impl_scalar_string!(MaxMemoryChannels);
 impl_from_parser_string!(MaxMemoryChannels, "Max Memory Channels");
 impl_scalar_vec_string!(CompatableChipsets);
 impl_from_parser_vec_string!(CompatableChipsets, "Compatable Chipsets");
+impl_scalar_string!(PerformanceCoreBaseFrequency);
+impl_from_parser_string!(PerformanceCoreBaseFrequency,"Performance-Core Base Frequency");
+impl_scalar_string!(EfficientCoreBaseFrequency);
+impl_from_parser_string!(EfficientCoreBaseFrequency,"Efficient-Core Base Frequency");
+impl_scalar_string!(PerformanceCoreBoostFrequency);
+impl_from_parser_string!(PerformanceCoreBoostFrequency,"Performance-Core Boost Frequency");
+impl_scalar_string!(EfficientCoreBoostFrequency);
+impl_from_parser_string!(EfficientCoreBoostFrequency,"Efficient-Core Boost Frequency");
+impl_scalar_string!(EfficientCoreArchitecture);
+impl_from_parser_string!(EfficientCoreArchitecture,"Efficient-Core Architecture");
+impl_scalar_string!(GpuModel);
+impl_from_parser_string!(GpuModel,"Gpu Model");
+impl_scalar_string!(ModuleCount);
+impl_from_parser_string!(ModuleCount,"Module Count");
+impl_scalar_string!(MaximumVramCapacity);
+impl_from_parser_string!(MaximumVramCapacity,"Maximum VRAM Capacity");
+impl_scalar_string!(MaxDisplays);
+impl_from_parser_string!(MaxDisplays,"Max Displays");
+impl_scalar_string!(CrossfireSupport);
+impl_from_parser_string!(CrossfireSupport,"Crossfire Support");
+impl_scalar_string!(FreeSyncSupport);
+impl_from_parser_string!(FreeSyncSupport,"FreeSync Support");
+impl_scalar_u16!(PerformanceCoreCount);
+impl_from_parser_u16!(PerformanceCoreCount, "Performance-Core Count");
+impl_scalar_u16!(EfficientCoreCount);
+impl_from_parser_u16!(EfficientCoreCount, "Efficient-Core Count");
+impl_scalar_u16!(PerformanceThreadCount);
+impl_from_parser_u16!(PerformanceThreadCount, "Performance-Thread Count");
+impl_scalar_u16!(EfficientThreadCount);
+impl_from_parser_u16!(EfficientThreadCount, "Efficient-Thread Count");
+impl_scalar_u16!(PixelShaders);
+impl_from_parser_u16!(PixelShaders, "Pixel Shaders");
+impl_scalar_bool!(CtdpSupport);
+impl_from_parser_bool!(CtdpSupport, "cTDP Support");

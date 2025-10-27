@@ -40,6 +40,17 @@ pub struct Cpu {
     max_memory_channels: Option<MaxMemoryChannels>,
     max_memory_frequency: Option<MaxMemoryFrequency>,
     compatable_chipsets: Option<CompatableChipsets>,
+    
+    performance_core_base_frequency: Option<PerformanceCoreBaseFrequency>,
+    efficient_core_base_frequency: Option<EfficientCoreBaseFrequency>,
+    performance_core_boost_frequency: Option<PerformanceCoreBoostFrequency>,
+    efficient_core_boost_frequency: Option<EfficientCoreBoostFrequency>,
+    performance_core_count: Option<PerformanceCoreCount>,
+    efficient_core_count: Option<EfficientCoreCount>,
+    performance_thread_count: Option<PerformanceThreadCount>,
+    efficient_thread_count: Option<EfficientThreadCount>,
+    ctdp_support: Option<CtdpSupport>,
+    efficient_core_architecture: Option<EfficientCoreArchitecture>,
     // Shared
     manufacturer: Option<Manufacturer>,
     market: Option<Market>,
@@ -89,6 +100,16 @@ impl SpecDbType for Cpu {
             max_memory_channels: MaxMemoryChannels::from_yaml(data),
             max_memory_frequency: MaxMemoryFrequency::from_yaml(data),
             compatable_chipsets: CompatableChipsets::from_yaml(data),
+            performance_core_base_frequency: PerformanceCoreBaseFrequency::from_yaml(data),
+            efficient_core_base_frequency: EfficientCoreBaseFrequency::from_yaml(data),
+            performance_core_boost_frequency: PerformanceCoreBoostFrequency::from_yaml(data),
+            efficient_core_boost_frequency: EfficientCoreBoostFrequency::from_yaml(data),
+            performance_core_count: PerformanceCoreCount::from_yaml(data),
+            efficient_core_count: EfficientCoreCount::from_yaml(data),
+            performance_thread_count: PerformanceThreadCount::from_yaml(data),
+            efficient_thread_count: EfficientThreadCount::from_yaml(data),
+            ctdp_support: CtdpSupport::from_yaml(data),
+            efficient_core_architecture: EfficientCoreArchitecture::from_yaml(data),
         }
     }
     
@@ -136,6 +157,16 @@ impl SpecDbType for Cpu {
             max_memory_channels: MaxMemoryChannels::from_hashmap(&data),
             max_memory_frequency: MaxMemoryFrequency::from_hashmap(&data),
             compatable_chipsets: CompatableChipsets::from_hashmap(&data),
+            performance_core_base_frequency: PerformanceCoreBaseFrequency::from_hashmap(&data),
+            efficient_core_base_frequency: EfficientCoreBaseFrequency::from_hashmap(&data),
+            performance_core_boost_frequency: PerformanceCoreBoostFrequency::from_hashmap(&data),
+            efficient_core_boost_frequency: EfficientCoreBoostFrequency::from_hashmap(&data),
+            performance_core_count: PerformanceCoreCount::from_hashmap(&data),
+            efficient_core_count: EfficientCoreCount::from_hashmap(&data),
+            performance_thread_count: PerformanceThreadCount::from_hashmap(&data),
+            efficient_thread_count: EfficientThreadCount::from_hashmap(&data),
+            ctdp_support: CtdpSupport::from_hashmap(&data),
+            efficient_core_architecture: EfficientCoreArchitecture::from_hashmap(&data),
         }
     }
 }

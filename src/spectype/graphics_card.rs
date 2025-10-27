@@ -46,6 +46,13 @@ pub struct GraphicsCard {
     tensor_cores: Option<TensorCores>,
     hardware_accelerated_encoding: Option<HardwareAcceleratedEncoding>,
     hardware_accelerated_decoding: Option<HardwareAcceleratedDecoding>,
+    gpu_model: Option<GpuModel>,
+    module_count: Option<ModuleCount>,
+    pixel_shaders: Option<PixelShaders>,
+    maximum_vram_capacity: Option<MaximumVramCapacity>,
+    max_displays: Option<MaxDisplays>,
+    crossfire_support: Option<CrossfireSupport>,
+    free_sync_support: Option<FreeSyncSupport>,
 }
 impl SpecDbType for GraphicsCard {
     fn from_yaml(data: &Yaml) -> Self {
@@ -187,6 +194,13 @@ impl SpecDbType for GraphicsCard {
             },
             hardware_accelerated_encoding: get_vec_string(data, "Hardware Accelerated Encoding").map(HardwareAcceleratedEncoding),
             hardware_accelerated_decoding: get_vec_string(data, "Hardware Accelerated Decoding").map(HardwareAcceleratedDecoding),
+            gpu_model: GpuModel::from_yaml(data),
+            module_count: ModuleCount::from_yaml(data),
+            pixel_shaders: PixelShaders::from_yaml(data),
+            maximum_vram_capacity: MaximumVramCapacity::from_yaml(data),
+            max_displays: MaxDisplays::from_yaml(data),
+            crossfire_support: CrossfireSupport::from_yaml(data),
+            free_sync_support: FreeSyncSupport::from_yaml(data),
         }
     }
     
@@ -273,6 +287,13 @@ impl SpecDbType for GraphicsCard {
             width: data.get("Width").and_then(|v| v.as_str().map(|s| Width(s.to_string()))),
             hardware_accelerated_encoding: get_vec_string("Hardware Accelerated Encoding").map(HardwareAcceleratedEncoding),
             hardware_accelerated_decoding: get_vec_string("Hardware Accelerated Decoding").map(HardwareAcceleratedDecoding),
+            gpu_model: GpuModel::from_hashmap(&data),
+            module_count: ModuleCount::from_hashmap(&data),
+            pixel_shaders: PixelShaders::from_hashmap(&data),
+            maximum_vram_capacity: MaximumVramCapacity::from_hashmap(&data),
+            max_displays: MaxDisplays::from_hashmap(&data),
+            crossfire_support: CrossfireSupport::from_hashmap(&data),
+            free_sync_support: FreeSyncSupport::from_hashmap(&data),
         }
     }
 }
