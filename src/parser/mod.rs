@@ -38,6 +38,10 @@ impl SpecDbFile {
             let struct_object = SpecDbStruct {
                 name: part_name.to_owned(),
                 part_type: Type::from_yaml(part_type, &parsed_data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
+                human_name: match parsed_data["humanName"].as_str() {
+                    Some(value) => Some(value.to_string()),
+                    None => None,
+                },
             };
 
 
@@ -70,6 +74,10 @@ impl SpecDbFile {
 
         let struct_object = SpecDbStruct {
             name: part_name.to_owned(),
+            human_name: match parsed_data["humanName"].as_str() {
+                Some(value) => Some(value.to_string()),
+                None => None,
+            },
             part_type: Type::from_hashmap(part_type, data).expect(format!("Invalid part type in file: {}", file_path).as_str()),
         };
         let bah = SpecDbFile {

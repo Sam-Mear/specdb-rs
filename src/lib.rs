@@ -20,6 +20,7 @@ pub struct SpecDb {
 #[derive(SimpleObject)]
 pub struct SpecDbStruct {
     pub name: String,
+    pub human_name: Option<String>,
     pub part_type: Type,
 }
 
