@@ -9,12 +9,12 @@ use crate::{data::*, spectype::SpecDbType};
 #[derive(Serialize)]
 #[derive(SimpleObject)]
 pub struct GraphicsArchitecture {
-    sections: Vec<Section>,
-    lithography: Lithography,
-    release_date: ReleaseDate,
-    direct_x_support: Option<DirectXSupport>,
-    vulkan_support: Option<VulkanSupport>,
-    manufacturer: Option<Manufacturer>,
+    pub sections: Vec<Section>,
+    pub lithography: Lithography,
+    pub release_date: ReleaseDate,
+    pub direct_x_support: Option<DirectXSupport>,
+    pub vulkan_support: Option<VulkanSupport>,
+    pub manufacturer: Option<Manufacturer>,
 }
 impl SpecDbType for GraphicsArchitecture {
     fn from_yaml(parsed_data: &Yaml) -> Self {

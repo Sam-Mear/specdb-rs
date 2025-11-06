@@ -9,9 +9,9 @@ use crate::{data::*, spectype::SpecDbType};
 #[derive(Serialize)]
 #[derive(SimpleObject)]
 pub struct ApuArchitecture {
-    sections: Vec<Section>,
-    lithography: Lithography,
-    release_date: ReleaseDate
+    pub sections: Vec<Section>,
+    pub lithography: Lithography,
+    pub release_date: ReleaseDate
 }
 impl SpecDbType for ApuArchitecture{
     fn from_yaml(data: &Yaml) -> Self {
